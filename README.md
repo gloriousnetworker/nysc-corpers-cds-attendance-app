@@ -81,7 +81,7 @@ Setup Instructions
 
 bash
 
-git clone https://github.com/yourusername/nysc-attendance-app.git
+git clone https://github.com/gloriousnetworker/nysc-corpers-cds-attendance-app.git
 cd nysc-attendance-app
 
     Install dependencies

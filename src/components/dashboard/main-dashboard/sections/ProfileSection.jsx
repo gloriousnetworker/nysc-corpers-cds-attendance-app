@@ -15,7 +15,7 @@ const cdsGroups = [
   'Culture & Tourism', 'Legal Aid'
 ];
 
-export default function ProfileSection({ userData, onUpdateProfile }) {
+export default function ProfileSection({ userData, onUpdateProfile, darkMode }) {
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState(userData);
   const [loading, setLoading] = useState(false);
@@ -63,8 +63,8 @@ export default function ProfileSection({ userData, onUpdateProfile }) {
     <div className="space-y-8">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-bold text-gray-800">Personal Information</h2>
-          <p className="text-gray-600">View and update your NYSC profile details</p>
+          <h2 className={`text-2xl font-bold ${darkMode ? 'text-white' : 'text-gray-800'}`}>Personal Information</h2>
+          <p className={darkMode ? 'text-gray-400' : 'text-gray-600'}>View and update your NYSC profile details</p>
         </div>
         
         {!isEditing ? (
@@ -78,7 +78,7 @@ export default function ProfileSection({ userData, onUpdateProfile }) {
           <div className="flex space-x-3">
             <button
               onClick={handleCancel}
-              className="border border-gray-300 text-gray-700 px-6 py-2 rounded-lg hover:bg-gray-50 transition font-medium"
+              className={`border ${darkMode ? 'border-gray-600 text-gray-300 hover:bg-gray-800' : 'border-gray-300 text-gray-700 hover:bg-gray-50'} px-6 py-2 rounded-lg transition font-medium`}
             >
               Cancel
             </button>
@@ -95,7 +95,7 @@ export default function ProfileSection({ userData, onUpdateProfile }) {
 
       {message && (
         <div className={`p-4 rounded-lg ${
-          message.includes('successfully') ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'
+          message.includes('successfully') ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400' : 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400'
         }`}>
           {message}
         </div>
@@ -105,7 +105,7 @@ export default function ProfileSection({ userData, onUpdateProfile }) {
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className={`block text-sm font-medium mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                 First Name
               </label>
               <input
@@ -113,12 +113,12 @@ export default function ProfileSection({ userData, onUpdateProfile }) {
                 name="firstName"
                 value={formData.firstName}
                 onChange={handleChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#008753] focus:border-transparent"
+                className={`w-full px-4 py-3 rounded-lg focus:ring-2 focus:ring-[#008753] focus:border-transparent ${darkMode ? 'bg-gray-800 border-gray-700 text-white' : 'border border-gray-300'}`}
                 required
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className={`block text-sm font-medium mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                 Last Name
               </label>
               <input
@@ -126,7 +126,7 @@ export default function ProfileSection({ userData, onUpdateProfile }) {
                 name="lastName"
                 value={formData.lastName}
                 onChange={handleChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#008753] focus:border-transparent"
+                className={`w-full px-4 py-3 rounded-lg focus:ring-2 focus:ring-[#008753] focus:border-transparent ${darkMode ? 'bg-gray-800 border-gray-700 text-white' : 'border border-gray-300'}`}
                 required
               />
             </div>
@@ -134,7 +134,7 @@ export default function ProfileSection({ userData, onUpdateProfile }) {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className={`block text-sm font-medium mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                 Email Address
               </label>
               <input
@@ -142,12 +142,12 @@ export default function ProfileSection({ userData, onUpdateProfile }) {
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#008753] focus:border-transparent"
+                className={`w-full px-4 py-3 rounded-lg focus:ring-2 focus:ring-[#008753] focus:border-transparent ${darkMode ? 'bg-gray-800 border-gray-700 text-white' : 'border border-gray-300'}`}
                 required
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className={`block text-sm font-medium mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                 Phone Number
               </label>
               <input
@@ -155,14 +155,14 @@ export default function ProfileSection({ userData, onUpdateProfile }) {
                 name="phone"
                 value={formData.phone}
                 onChange={handleChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#008753] focus:border-transparent"
+                className={`w-full px-4 py-3 rounded-lg focus:ring-2 focus:ring-[#008753] focus:border-transparent ${darkMode ? 'bg-gray-800 border-gray-700 text-white' : 'border border-gray-300'}`}
                 required
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className={`block text-sm font-medium mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
               State Code
             </label>
             <input
@@ -170,21 +170,21 @@ export default function ProfileSection({ userData, onUpdateProfile }) {
               name="stateCode"
               value={formData.stateCode}
               onChange={handleChange}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#008753] focus:border-transparent"
+              className={`w-full px-4 py-3 rounded-lg focus:ring-2 focus:ring-[#008753] focus:border-transparent ${darkMode ? 'bg-gray-800 border-gray-700 text-white' : 'border border-gray-300'}`}
               required
             />
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className={`block text-sm font-medium mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                 Serving State
               </label>
               <select
                 name="servingState"
                 value={formData.servingState}
                 onChange={handleChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#008753] focus:border-transparent"
+                className={`w-full px-4 py-3 rounded-lg focus:ring-2 focus:ring-[#008753] focus:border-transparent ${darkMode ? 'bg-gray-800 border-gray-700 text-white' : 'border border-gray-300'}`}
                 required
               >
                 <option value="">Select State</option>
@@ -194,7 +194,7 @@ export default function ProfileSection({ userData, onUpdateProfile }) {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className={`block text-sm font-medium mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                 Local Government
               </label>
               <input
@@ -202,14 +202,14 @@ export default function ProfileSection({ userData, onUpdateProfile }) {
                 name="localGovernment"
                 value={formData.localGovernment}
                 onChange={handleChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#008753] focus:border-transparent"
+                className={`w-full px-4 py-3 rounded-lg focus:ring-2 focus:ring-[#008753] focus:border-transparent ${darkMode ? 'bg-gray-800 border-gray-700 text-white' : 'border border-gray-300'}`}
                 required
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className={`block text-sm font-medium mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
               Place of Primary Assignment (PPA)
             </label>
             <input
@@ -217,20 +217,20 @@ export default function ProfileSection({ userData, onUpdateProfile }) {
               name="ppa"
               value={formData.ppa}
               onChange={handleChange}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#008753] focus:border-transparent"
+              className={`w-full px-4 py-3 rounded-lg focus:ring-2 focus:ring-[#008753] focus:border-transparent ${darkMode ? 'bg-gray-800 border-gray-700 text-white' : 'border border-gray-300'}`}
               required
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className={`block text-sm font-medium mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
               CDS Group
             </label>
             <select
               name="cdsGroup"
               value={formData.cdsGroup}
               onChange={handleChange}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#008753] focus:border-transparent"
+              className={`w-full px-4 py-3 rounded-lg focus:ring-2 focus:ring-[#008753] focus:border-transparent ${darkMode ? 'bg-gray-800 border-gray-700 text-white' : 'border border-gray-300'}`}
               required
             >
               <option value="">Select CDS Group</option>
@@ -244,90 +244,90 @@ export default function ProfileSection({ userData, onUpdateProfile }) {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           <div className="space-y-6">
             <div>
-              <h3 className="text-lg font-semibold text-gray-800 mb-4">Personal Details</h3>
-              <div className="space-y-4">
+              <h3 className={`text-lg font-semibold mb-4 ${darkMode ? 'text-white' : 'text-gray-800'}`}>Personal Details</h3>
+              <div className={`space-y-4 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Full Name:</span>
-                  <span className="font-medium">{userData.fullName}</span>
+                  <span>Full Name:</span>
+                  <span className="font-medium text-gray-800 dark:text-white">{userData.fullName}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Email:</span>
-                  <span className="font-medium">{userData.email}</span>
+                  <span>Email:</span>
+                  <span className="font-medium text-gray-800 dark:text-white">{userData.email}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Phone:</span>
-                  <span className="font-medium">{userData.phone}</span>
+                  <span>Phone:</span>
+                  <span className="font-medium text-gray-800 dark:text-white">{userData.phone}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600">State Code:</span>
-                  <span className="font-medium">{userData.stateCode}</span>
+                  <span>State Code:</span>
+                  <span className="font-medium text-gray-800 dark:text-white">{userData.stateCode}</span>
                 </div>
               </div>
             </div>
 
             <div>
-              <h3 className="text-lg font-semibold text-gray-800 mb-4">NYSC Details</h3>
-              <div className="space-y-4">
+              <h3 className={`text-lg font-semibold mb-4 ${darkMode ? 'text-white' : 'text-gray-800'}`}>NYSC Details</h3>
+              <div className={`space-y-4 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Serving State:</span>
-                  <span className="font-medium">{userData.servingState}</span>
+                  <span>Serving State:</span>
+                  <span className="font-medium text-gray-800 dark:text-white">{userData.servingState}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Local Government:</span>
-                  <span className="font-medium">{userData.localGovernment}</span>
+                  <span>Local Government:</span>
+                  <span className="font-medium text-gray-800 dark:text-white">{userData.localGovernment}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600">PPA:</span>
-                  <span className="font-medium">{userData.ppa}</span>
+                  <span>PPA:</span>
+                  <span className="font-medium text-gray-800 dark:text-white">{userData.ppa}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600">CDS Group:</span>
-                  <span className="font-medium">{userData.cdsGroup}</span>
+                  <span>CDS Group:</span>
+                  <span className="font-medium text-gray-800 dark:text-white">{userData.cdsGroup}</span>
                 </div>
               </div>
             </div>
           </div>
 
-          <div className="bg-gray-50 p-6 rounded-2xl">
-            <h3 className="text-lg font-semibold text-gray-800 mb-4">Profile Summary</h3>
+          <div className={`p-6 rounded-2xl ${darkMode ? 'bg-gray-800' : 'bg-gray-50'}`}>
+            <h3 className={`text-lg font-semibold mb-4 ${darkMode ? 'text-white' : 'text-gray-800'}`}>Profile Summary</h3>
             <div className="space-y-4">
-              <div className="flex items-center justify-between p-3 bg-white rounded-lg">
+              <div className={`flex items-center justify-between p-3 rounded-lg ${darkMode ? 'bg-gray-700' : 'bg-white'}`}>
                 <div className="flex items-center">
                   <div className="w-10 h-10 bg-[#008753] rounded-full flex items-center justify-center text-white mr-3">
                     📊
                   </div>
                   <div>
-                    <div className="font-medium">Attendance Rate</div>
-                    <div className="text-sm text-gray-600">Current month</div>
+                    <div className={`font-medium ${darkMode ? 'text-white' : 'text-gray-800'}`}>Attendance Rate</div>
+                    <div className={darkMode ? 'text-gray-400' : 'text-gray-600'}>Current month</div>
                   </div>
                 </div>
-                <div className="text-2xl font-bold text-[#008753]">85%</div>
+                <div className="text-2xl font-bold text-[#008753] dark:text-green-400">85%</div>
               </div>
               
-              <div className="flex items-center justify-between p-3 bg-white rounded-lg">
+              <div className={`flex items-center justify-between p-3 rounded-lg ${darkMode ? 'bg-gray-700' : 'bg-white'}`}>
                 <div className="flex items-center">
                   <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white mr-3">
                     📅
                   </div>
                   <div>
-                    <div className="font-medium">Service Duration</div>
-                    <div className="text-sm text-gray-600">8 of 52 weeks</div>
+                    <div className={`font-medium ${darkMode ? 'text-white' : 'text-gray-800'}`}>Service Duration</div>
+                    <div className={darkMode ? 'text-gray-400' : 'text-gray-600'}>8 of 52 weeks</div>
                   </div>
                 </div>
-                <div className="text-2xl font-bold text-blue-500">15%</div>
+                <div className="text-2xl font-bold text-blue-500 dark:text-blue-400">15%</div>
               </div>
               
-              <div className="flex items-center justify-between p-3 bg-white rounded-lg">
+              <div className={`flex items-center justify-between p-3 rounded-lg ${darkMode ? 'bg-gray-700' : 'bg-white'}`}>
                 <div className="flex items-center">
                   <div className="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center text-white mr-3">
                     ✅
                   </div>
                   <div>
-                    <div className="font-medium">Profile Completion</div>
-                    <div className="text-sm text-gray-600">All details updated</div>
+                    <div className={`font-medium ${darkMode ? 'text-white' : 'text-gray-800'}`}>Profile Completion</div>
+                    <div className={darkMode ? 'text-gray-400' : 'text-gray-600'}>All details updated</div>
                   </div>
                 </div>
-                <div className="text-2xl font-bold text-green-500">100%</div>
+                <div className="text-2xl font-bold text-green-500 dark:text-green-400">100%</div>
               </div>
             </div>
           </div>

@@ -1,7 +1,7 @@
 'use client';
 import { useState } from 'react';
 
-export default function AttendanceSection({ userData }) {
+export default function AttendanceSection({ userData, darkMode }) {
   const [currentMonth, setCurrentMonth] = useState(new Date().getMonth());
   const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
 
@@ -52,8 +52,8 @@ export default function AttendanceSection({ userData }) {
     <div className="space-y-8">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-bold text-gray-800">Monthly Attendance Calendar</h2>
-          <p className="text-gray-600">Track your CDS attendance for {months[currentMonth]} {currentYear}</p>
+          <h2 className={`text-2xl font-bold ${darkMode ? 'text-white' : 'text-gray-800'}`}>Monthly Attendance Calendar</h2>
+          <p className={darkMode ? 'text-gray-400' : 'text-gray-600'}>Track your CDS attendance for {months[currentMonth]} {currentYear}</p>
         </div>
         
         <div className="flex items-center space-x-4">
@@ -66,11 +66,11 @@ export default function AttendanceSection({ userData }) {
                 setCurrentYear(currentYear - 1);
               }
             }}
-            className="p-2 hover:bg-gray-100 rounded-lg"
+            className={`p-2 rounded-lg ${darkMode ? 'text-gray-300 hover:bg-gray-800' : 'hover:bg-gray-100'}`}
           >
             ←
           </button>
-          <span className="font-semibold text-lg">
+          <span className={`font-semibold text-lg ${darkMode ? 'text-white' : 'text-gray-800'}`}>
             {months[currentMonth]} {currentYear}
           </span>
           <button
@@ -82,7 +82,7 @@ export default function AttendanceSection({ userData }) {
                 setCurrentYear(currentYear + 1);
               }
             }}
-            className="p-2 hover:bg-gray-100 rounded-lg"
+            className={`p-2 rounded-lg ${darkMode ? 'text-gray-300 hover:bg-gray-800' : 'hover:bg-gray-100'}`}
           >
             →
           </button>
@@ -91,7 +91,7 @@ export default function AttendanceSection({ userData }) {
 
       <div className="grid grid-cols-7 gap-2 mb-4">
         {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
-          <div key={day} className="text-center font-semibold text-gray-600 py-2">
+          <div key={day} className={`text-center font-semibold py-2 ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
             {day}
           </div>
         ))}
@@ -99,12 +99,12 @@ export default function AttendanceSection({ userData }) {
 
       <div className="grid grid-cols-7 gap-2">
         {calendarDays.map((day, index) => (
-          <div key={index} className={`min-h-24 p-2 border rounded-lg ${
-            day ? (day.isToday ? 'border-[#008753] border-2' : 'border-gray-200') : ''
+          <div key={index} className={`min-h-24 p-2 rounded-lg ${
+            day ? (day.isToday ? 'border-2 border-[#008753]' : `${darkMode ? 'bg-gray-800' : 'bg-white'} border ${darkMode ? 'border-gray-700' : 'border-gray-200'}`) : ''
           }`}>
             {day && (
               <>
-                <div className="text-right font-medium mb-1">{day.day}</div>
+                <div className={`text-right font-medium mb-1 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>{day.day}</div>
                 <div className="flex justify-center">
                   {!day.isWeekend && (
                     <div className={`w-3 h-3 rounded-full ${
@@ -120,30 +120,30 @@ export default function AttendanceSection({ userData }) {
         ))}
       </div>
 
-      <div className="flex items-center justify-center space-x-6 mt-6">
+      <div className="flex flex-wrap items-center justify-center gap-6 mt-6">
         <div className="flex items-center">
           <div className="w-3 h-3 bg-green-500 rounded-full mr-2"></div>
-          <span className="text-sm">Present</span>
+          <span className={`text-sm ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>Present</span>
         </div>
         <div className="flex items-center">
           <div className="w-3 h-3 bg-yellow-500 rounded-full mr-2"></div>
-          <span className="text-sm">Late</span>
+          <span className={`text-sm ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>Late</span>
         </div>
         <div className="flex items-center">
           <div className="w-3 h-3 bg-red-500 rounded-full mr-2"></div>
-          <span className="text-sm">Absent</span>
+          <span className={`text-sm ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>Absent</span>
         </div>
         <div className="flex items-center">
-          <div className="w-3 h-3 bg-gray-300 rounded-full mr-2"></div>
-          <span className="text-sm">Weekend</span>
+          <div className="w-3 h-3 bg-gray-400 rounded-full mr-2"></div>
+          <span className={`text-sm ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>Weekend</span>
         </div>
       </div>
 
-      <div className="bg-gray-50 p-6 rounded-2xl">
+      <div className={`p-6 rounded-2xl ${darkMode ? 'bg-gray-800' : 'bg-gray-50'}`}>
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <h3 className="text-xl font-bold text-gray-800">Mark Today's Attendance</h3>
-            <p className="text-gray-600">Click below to mark your attendance for today</p>
+            <h3 className={`text-xl font-bold ${darkMode ? 'text-white' : 'text-gray-800'}`}>Mark Today's Attendance</h3>
+            <p className={darkMode ? 'text-gray-400' : 'text-gray-600'}>Click below to mark your attendance for today</p>
           </div>
           <button
             onClick={handleMarkAttendance}
@@ -155,35 +155,35 @@ export default function AttendanceSection({ userData }) {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-white border border-gray-200 p-6 rounded-2xl">
-          <h4 className="font-bold text-gray-800 mb-2">Attendance Summary</h4>
-          <div className="space-y-3">
+        <div className={`p-6 rounded-2xl ${darkMode ? 'bg-gray-800' : 'bg-white border border-gray-200'}`}>
+          <h4 className={`font-bold mb-2 ${darkMode ? 'text-white' : 'text-gray-800'}`}>Attendance Summary</h4>
+          <div className={`space-y-3 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
             <div className="flex justify-between">
               <span>Total Days:</span>
-              <span className="font-bold">48</span>
+              <span className="font-bold text-gray-800 dark:text-white">48</span>
             </div>
             <div className="flex justify-between">
               <span>Days Present:</span>
-              <span className="font-bold text-green-600">41</span>
+              <span className="font-bold text-green-600 dark:text-green-400">41</span>
             </div>
             <div className="flex justify-between">
               <span>Days Absent:</span>
-              <span className="font-bold text-red-600">7</span>
+              <span className="font-bold text-red-600 dark:text-red-400">7</span>
             </div>
             <div className="flex justify-between">
               <span>Attendance Rate:</span>
-              <span className="font-bold">85%</span>
+              <span className="font-bold text-gray-800 dark:text-white">85%</span>
             </div>
           </div>
         </div>
 
-        <div className="bg-white border border-gray-200 p-6 rounded-2xl">
-          <h4 className="font-bold text-gray-800 mb-2">Recent Attendance</h4>
-          <div className="space-y-3">
+        <div className={`p-6 rounded-2xl ${darkMode ? 'bg-gray-800' : 'bg-white border border-gray-200'}`}>
+          <h4 className={`font-bold mb-2 ${darkMode ? 'text-white' : 'text-gray-800'}`}>Recent Attendance</h4>
+          <div className={`space-y-3 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
             {['Today', 'Yesterday', '2 days ago', '1 week ago'].map((day, index) => (
               <div key={index} className="flex justify-between items-center">
                 <span>{day}</span>
-                <span className="px-3 py-1 bg-green-100 text-green-800 text-sm rounded-full">
+                <span className="px-3 py-1 bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400 text-sm rounded-full">
                   Present
                 </span>
               </div>
@@ -191,16 +191,16 @@ export default function AttendanceSection({ userData }) {
           </div>
         </div>
 
-        <div className="bg-white border border-gray-200 p-6 rounded-2xl">
-          <h4 className="font-bold text-gray-800 mb-2">Download Reports</h4>
+        <div className={`p-6 rounded-2xl ${darkMode ? 'bg-gray-800' : 'bg-white border border-gray-200'}`}>
+          <h4 className={`font-bold mb-2 ${darkMode ? 'text-white' : 'text-gray-800'}`}>Download Reports</h4>
           <div className="space-y-3">
-            <button className="w-full text-left p-3 hover:bg-gray-50 rounded-lg border">
+            <button className={`w-full text-left p-3 rounded-lg border ${darkMode ? 'border-gray-700 text-gray-300 hover:bg-gray-700' : 'border-gray-200 hover:bg-gray-50'}`}>
               📄 Monthly Report (PDF)
             </button>
-            <button className="w-full text-left p-3 hover:bg-gray-50 rounded-lg border">
+            <button className={`w-full text-left p-3 rounded-lg border ${darkMode ? 'border-gray-700 text-gray-300 hover:bg-gray-700' : 'border-gray-200 hover:bg-gray-50'}`}>
               📊 Quarterly Analytics
             </button>
-            <button className="w-full text-left p-3 hover:bg-gray-50 rounded-lg border">
+            <button className={`w-full text-left p-3 rounded-lg border ${darkMode ? 'border-gray-700 text-gray-300 hover:bg-gray-700' : 'border-gray-200 hover:bg-gray-50'}`}>
               🎯 Performance Summary
             </button>
           </div>

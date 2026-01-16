@@ -1,6 +1,7 @@
 const { nextui } = require('@nextui-org/react');
 
 module.exports = {
+  darkMode: 'class',
   content: [
     './src/app/**/*.{js,ts,jsx,tsx,mdx}',
     './src/features/**/*.{js,ts,jsx,tsx,mdx}',
@@ -12,8 +13,14 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        background: '#f9fafb',
-        foreground: '#111827',
+        background: {
+          DEFAULT: '#f9fafb',
+          dark: '#0f172a',
+        },
+        foreground: {
+          DEFAULT: '#111827',
+          dark: '#f8fafc',
+        },
       },
       fontFamily: {
         playfair: ['"Playfair Display"', 'serif'],

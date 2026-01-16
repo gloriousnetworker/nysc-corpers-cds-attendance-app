@@ -1,7 +1,7 @@
 'use client';
 import { useState } from 'react';
 
-export default function ScheduleSection({ userData }) {
+export default function ScheduleSection({ userData, darkMode }) {
   const [selectedDate, setSelectedDate] = useState(new Date());
   
   const scheduleData = [
@@ -47,16 +47,16 @@ export default function ScheduleSection({ userData }) {
     <div className="space-y-8">
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2 space-y-6">
-          <h2 className="text-2xl font-bold text-gray-800">CDS Schedule Calendar</h2>
+          <h2 className={`text-2xl font-bold ${darkMode ? 'text-white' : 'text-gray-800'}`}>CDS Schedule Calendar</h2>
           
-          <div className="bg-white border border-gray-200 rounded-xl p-6">
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-lg font-semibold text-gray-800">March 2024 Schedule</h3>
+          <div className={`rounded-xl p-6 ${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+              <h3 className={`text-lg font-semibold ${darkMode ? 'text-white' : 'text-gray-800'}`}>March 2024 Schedule</h3>
               <div className="flex space-x-2">
-                <button className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
+                <button className={`px-4 py-2 rounded-lg ${darkMode ? 'border-gray-600 text-gray-300 hover:bg-gray-700' : 'border-gray-300 hover:bg-gray-50'}`}>
                   ← Previous
                 </button>
-                <button className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
+                <button className={`px-4 py-2 rounded-lg ${darkMode ? 'border-gray-600 text-gray-300 hover:bg-gray-700' : 'border-gray-300 hover:bg-gray-50'}`}>
                   Next →
                 </button>
               </div>
@@ -64,7 +64,7 @@ export default function ScheduleSection({ userData }) {
 
             <div className="grid grid-cols-7 gap-2 mb-4">
               {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
-                <div key={day} className="text-center font-semibold text-gray-600 py-2">
+                <div key={day} className={`text-center font-semibold py-2 ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
                   {day}
                 </div>
               ))}
@@ -74,15 +74,15 @@ export default function ScheduleSection({ userData }) {
               {Array.from({ length: 31 }).map((_, index) => (
                 <div
                   key={index}
-                  className={`min-h-20 p-2 border rounded-lg ${
+                  className={`min-h-20 p-2 rounded-lg ${
                     index + 1 === 15 || index + 1 === 22 || index + 1 === 29
-                      ? 'border-[#008753] border-2 bg-green-50'
-                      : 'border-gray-200'
+                      ? 'border-2 border-[#008753] bg-green-100 dark:bg-green-900/30'
+                      : `${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`
                   }`}
                 >
-                  <div className="text-right font-medium">{index + 1}</div>
+                  <div className={`text-right font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>{index + 1}</div>
                   {[15, 22, 29].includes(index + 1) && (
-                    <div className="text-xs text-green-600 font-medium">CDS Day</div>
+                    <div className="text-xs text-green-600 dark:text-green-400 font-medium">CDS Day</div>
                   )}
                 </div>
               ))}
@@ -91,11 +91,11 @@ export default function ScheduleSection({ userData }) {
 
           <div className="space-y-6">
             {scheduleData.map((daySchedule, index) => (
-              <div key={index} className="bg-white border border-gray-200 rounded-xl p-6">
-                <div className="flex items-center justify-between mb-4">
+              <div key={index} className={`rounded-xl p-6 ${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
                   <div>
-                    <h4 className="text-lg font-bold text-gray-800">{daySchedule.day}, {daySchedule.date}</h4>
-                    <p className="text-gray-600">{daySchedule.events.length} scheduled events</p>
+                    <h4 className={`text-lg font-bold ${darkMode ? 'text-white' : 'text-gray-800'}`}>{daySchedule.day}, {daySchedule.date}</h4>
+                    <p className={darkMode ? 'text-gray-400' : 'text-gray-600'}>{daySchedule.events.length} scheduled events</p>
                   </div>
                   <button className="px-4 py-2 bg-[#008753] text-white rounded-lg hover:bg-[#006b42] text-sm">
                     Set Reminder
@@ -104,18 +104,18 @@ export default function ScheduleSection({ userData }) {
                 
                 <div className="space-y-4">
                   {daySchedule.events.map((event, eventIndex) => (
-                    <div key={eventIndex} className="flex items-start p-4 border border-gray-200 rounded-lg hover:bg-gray-50">
+                    <div key={eventIndex} className={`flex items-start p-4 rounded-lg ${darkMode ? 'border-gray-700 hover:bg-gray-700' : 'border-gray-200 hover:bg-gray-50'}`}>
                       <div className="mr-4">
-                        <div className="font-bold text-gray-800">{event.time}</div>
+                        <div className={`font-bold ${darkMode ? 'text-white' : 'text-gray-800'}`}>{event.time}</div>
                       </div>
                       <div className="flex-1">
-                        <div className="font-medium text-gray-800">{event.title}</div>
-                        <div className="text-gray-600 text-sm">{event.location}</div>
+                        <div className={`font-medium ${darkMode ? 'text-white' : 'text-gray-800'}`}>{event.title}</div>
+                        <div className={darkMode ? 'text-gray-400' : 'text-gray-600'}>{event.location}</div>
                       </div>
                       <div className={`px-3 py-1 rounded-full text-xs ${
-                        event.type === 'mandatory' ? 'bg-red-100 text-red-800' :
-                        event.type === 'workshop' ? 'bg-blue-100 text-blue-800' :
-                        'bg-green-100 text-green-800'
+                        event.type === 'mandatory' ? 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400' :
+                        event.type === 'workshop' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400' :
+                        'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
                       }`}>
                         {event.type}
                       </div>
@@ -152,26 +152,26 @@ export default function ScheduleSection({ userData }) {
             </button>
           </div>
 
-          <div className="bg-white border border-gray-200 rounded-xl p-6">
-            <h3 className="text-lg font-semibold text-gray-800 mb-4">Schedule Information</h3>
-            <div className="space-y-3">
+          <div className={`rounded-xl p-6 ${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
+            <h3 className={`text-lg font-semibold mb-4 ${darkMode ? 'text-white' : 'text-gray-800'}`}>Schedule Information</h3>
+            <div className={`space-y-3 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
               <div className="flex items-center">
                 <div className="w-3 h-3 bg-red-500 rounded-full mr-2"></div>
-                <span className="text-gray-700">Mandatory Attendance</span>
+                <span>Mandatory Attendance</span>
               </div>
               <div className="flex items-center">
                 <div className="w-3 h-3 bg-green-500 rounded-full mr-2"></div>
-                <span className="text-gray-700">Optional Activities</span>
+                <span>Optional Activities</span>
               </div>
               <div className="flex items-center">
                 <div className="w-3 h-3 bg-blue-500 rounded-full mr-2"></div>
-                <span className="text-gray-700">Workshops/Training</span>
+                <span>Workshops/Training</span>
               </div>
             </div>
             
-            <div className="mt-6 pt-6 border-t border-gray-200">
-              <h4 className="font-medium text-gray-800 mb-2">CDS Coordinator</h4>
-              <div className="text-gray-600 text-sm">
+            <div className={`mt-6 pt-6 ${darkMode ? 'border-gray-700' : 'border-gray-200'}`}>
+              <h4 className={`font-medium mb-2 ${darkMode ? 'text-white' : 'text-gray-800'}`}>CDS Coordinator</h4>
+              <div className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
                 <div>Mr. Adeyemi Johnson</div>
                 <div>Phone: 0803 XXX XXXX</div>
                 <div>Email: coordinator@nysc.gov.ng</div>
@@ -179,20 +179,20 @@ export default function ScheduleSection({ userData }) {
             </div>
           </div>
 
-          <div className="bg-blue-50 border border-blue-200 rounded-xl p-6">
-            <h3 className="text-lg font-semibold text-blue-800 mb-4">📅 Add to Calendar</h3>
+          <div className={`rounded-xl p-6 ${darkMode ? 'bg-blue-900/30 border-blue-800' : 'bg-blue-50 border-blue-200'}`}>
+            <h3 className={`text-lg font-semibold mb-4 ${darkMode ? 'text-blue-400' : 'text-blue-800'}`}>📅 Add to Calendar</h3>
             <div className="space-y-3">
-              <button className="w-full text-left p-3 bg-white border border-blue-200 rounded-lg hover:bg-blue-100">
-                <div className="font-medium text-blue-800">Google Calendar</div>
-                <div className="text-sm text-blue-600">Add all events</div>
+              <button className={`w-full text-left p-3 rounded-lg ${darkMode ? 'bg-blue-900/20 border-blue-800 text-blue-300 hover:bg-blue-900/40' : 'bg-white border-blue-200 text-blue-800 hover:bg-blue-100'}`}>
+                <div className="font-medium">Google Calendar</div>
+                <div className={`text-sm ${darkMode ? 'text-blue-400' : 'text-blue-600'}`}>Add all events</div>
               </button>
-              <button className="w-full text-left p-3 bg-white border border-blue-200 rounded-lg hover:bg-blue-100">
-                <div className="font-medium text-blue-800">Outlook Calendar</div>
-                <div className="text-sm text-blue-600">Sync schedule</div>
+              <button className={`w-full text-left p-3 rounded-lg ${darkMode ? 'bg-blue-900/20 border-blue-800 text-blue-300 hover:bg-blue-900/40' : 'bg-white border-blue-200 text-blue-800 hover:bg-blue-100'}`}>
+                <div className="font-medium">Outlook Calendar</div>
+                <div className={`text-sm ${darkMode ? 'text-blue-400' : 'text-blue-600'}`}>Sync schedule</div>
               </button>
-              <button className="w-full text-left p-3 bg-white border border-blue-200 rounded-lg hover:bg-blue-100">
-                <div className="font-medium text-blue-800">Apple Calendar</div>
-                <div className="text-sm text-blue-600">Import events</div>
+              <button className={`w-full text-left p-3 rounded-lg ${darkMode ? 'bg-blue-900/20 border-blue-800 text-blue-300 hover:bg-blue-900/40' : 'bg-white border-blue-200 text-blue-800 hover:bg-blue-100'}`}>
+                <div className="font-medium">Apple Calendar</div>
+                <div className={`text-sm ${darkMode ? 'text-blue-400' : 'text-blue-600'}`}>Import events</div>
               </button>
             </div>
           </div>

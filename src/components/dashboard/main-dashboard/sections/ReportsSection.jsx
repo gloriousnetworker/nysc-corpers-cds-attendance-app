@@ -1,7 +1,7 @@
 'use client';
 import { useState } from 'react';
 
-export default function ReportsSection({ userData }) {
+export default function ReportsSection({ userData, darkMode }) {
   const [reportType, setReportType] = useState('attendance');
   const [dateRange, setDateRange] = useState('monthly');
 
@@ -26,12 +26,12 @@ export default function ReportsSection({ userData }) {
     <div className="space-y-8">
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2 space-y-6">
-          <div className="bg-white border border-gray-200 rounded-xl p-6">
-            <h3 className="text-xl font-bold text-gray-800 mb-6">Generate New Report</h3>
+          <div className={`rounded-xl p-6 ${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
+            <h3 className={`text-xl font-bold mb-6 ${darkMode ? 'text-white' : 'text-gray-800'}`}>Generate New Report</h3>
             
             <div className="space-y-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-3">
+                <label className={`block text-sm font-medium mb-3 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                   Report Type
                 </label>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -39,10 +39,10 @@ export default function ReportsSection({ userData }) {
                     <button
                       key={type}
                       onClick={() => setReportType(type)}
-                      className={`p-4 border-2 rounded-xl text-center transition ${
+                      className={`p-4 rounded-xl text-center border-2 transition ${
                         reportType === type
-                          ? 'border-[#008753] bg-green-50'
-                          : 'border-gray-300 hover:border-gray-400'
+                          ? 'border-[#008753] bg-green-100 dark:bg-green-900/30'
+                          : `${darkMode ? 'border-gray-700 hover:border-gray-600' : 'border-gray-300 hover:border-gray-400'}`
                       }`}
                     >
                       <div className="text-2xl mb-2">
@@ -50,14 +50,14 @@ export default function ReportsSection({ userData }) {
                         {type === 'performance' && '📈'}
                         {type === 'certificate' && '🏆'}
                       </div>
-                      <div className="font-medium capitalize">{type} Report</div>
+                      <div className={`font-medium capitalize ${darkMode ? 'text-gray-300' : ''}`}>{type} Report</div>
                     </button>
                   ))}
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-3">
+                <label className={`block text-sm font-medium mb-3 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                   Date Range
                 </label>
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
@@ -68,7 +68,7 @@ export default function ReportsSection({ userData }) {
                       className={`py-3 rounded-lg text-center font-medium ${
                         dateRange === range
                           ? 'bg-[#008753] text-white'
-                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                          : `${darkMode ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`
                       }`}
                     >
                       {range.charAt(0).toUpperCase() + range.slice(1)}
@@ -77,24 +77,24 @@ export default function ReportsSection({ userData }) {
                 </div>
               </div>
 
-              <div className="bg-gray-50 p-6 rounded-xl">
-                <h4 className="font-semibold text-gray-800 mb-4">Report Preview</h4>
-                <div className="space-y-3">
+              <div className={`p-6 rounded-xl ${darkMode ? 'bg-gray-700' : 'bg-gray-50'}`}>
+                <h4 className={`font-semibold mb-4 ${darkMode ? 'text-white' : 'text-gray-800'}`}>Report Preview</h4>
+                <div className={`space-y-3 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Report Type:</span>
-                    <span className="font-medium capitalize">{reportType} Report</span>
+                    <span>Report Type:</span>
+                    <span className="font-medium capitalize text-gray-800 dark:text-white">{reportType} Report</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Period:</span>
-                    <span className="font-medium capitalize">{dateRange} (March 2024)</span>
+                    <span>Period:</span>
+                    <span className="font-medium capitalize text-gray-800 dark:text-white">{dateRange} (March 2024)</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Format:</span>
-                    <span className="font-medium">PDF Document</span>
+                    <span>Format:</span>
+                    <span className="font-medium text-gray-800 dark:text-white">PDF Document</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Estimated Size:</span>
-                    <span className="font-medium">2-3 MB</span>
+                    <span>Estimated Size:</span>
+                    <span className="font-medium text-gray-800 dark:text-white">2-3 MB</span>
                   </div>
                 </div>
               </div>
@@ -108,32 +108,32 @@ export default function ReportsSection({ userData }) {
             </div>
           </div>
 
-          <div className="bg-white border border-gray-200 rounded-xl p-6">
-            <h3 className="text-xl font-bold text-gray-800 mb-6">Report History</h3>
+          <div className={`rounded-xl p-6 ${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
+            <h3 className={`text-xl font-bold mb-6 ${darkMode ? 'text-white' : 'text-gray-800'}`}>Report History</h3>
             
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
-                  <tr className="bg-gray-50">
-                    <th className="py-3 px-4 text-left text-gray-600 font-semibold">Report Title</th>
-                    <th className="py-3 px-4 text-left text-gray-600 font-semibold">Type</th>
-                    <th className="py-3 px-4 text-left text-gray-600 font-semibold">Date</th>
-                    <th className="py-3 px-4 text-left text-gray-600 font-semibold">Format</th>
-                    <th className="py-3 px-4 text-left text-gray-600 font-semibold">Action</th>
+                  <tr className={darkMode ? 'bg-gray-700' : 'bg-gray-50'}>
+                    <th className={`py-3 px-4 text-left font-semibold ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>Report Title</th>
+                    <th className={`py-3 px-4 text-left font-semibold ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>Type</th>
+                    <th className={`py-3 px-4 text-left font-semibold ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>Date</th>
+                    <th className={`py-3 px-4 text-left font-semibold ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>Format</th>
+                    <th className={`py-3 px-4 text-left font-semibold ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>Action</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-200">
+                <tbody className={darkMode ? 'divide-gray-700' : 'divide-gray-200'}>
                   {reports.map(report => (
-                    <tr key={report.id} className="hover:bg-gray-50">
-                      <td className="py-4 px-4 font-medium">{report.title}</td>
+                    <tr key={report.id} className={darkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-50'}>
+                      <td className={`py-4 px-4 font-medium ${darkMode ? 'text-gray-300' : ''}`}>{report.title}</td>
                       <td className="py-4 px-4">
-                        <span className="px-3 py-1 bg-gray-100 text-gray-800 rounded-full text-sm capitalize">
+                        <span className={`px-3 py-1 rounded-full text-sm ${darkMode ? 'bg-gray-700 text-gray-300' : 'bg-gray-100 text-gray-800'}`}>
                           {report.type}
                         </span>
                       </td>
-                      <td className="py-4 px-4 text-gray-600">{report.date}</td>
+                      <td className={`py-4 px-4 ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>{report.date}</td>
                       <td className="py-4 px-4">
-                        <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm">
+                        <span className={`px-3 py-1 rounded-full text-sm ${darkMode ? 'bg-blue-900/30 text-blue-400' : 'bg-blue-100 text-blue-800'}`}>
                           {report.format}
                         </span>
                       </td>
@@ -142,7 +142,7 @@ export default function ReportsSection({ userData }) {
                           <button className="px-3 py-1 bg-[#008753] text-white rounded-lg hover:bg-[#006b42] text-sm">
                             Download
                           </button>
-                          <button className="px-3 py-1 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 text-sm">
+                          <button className={`px-3 py-1 rounded-lg text-sm ${darkMode ? 'border-gray-600 text-gray-300 hover:bg-gray-700' : 'border-gray-300 text-gray-700 hover:bg-gray-50'}`}>
                             View
                           </button>
                         </div>
@@ -180,48 +180,48 @@ export default function ReportsSection({ userData }) {
             </div>
           </div>
 
-          <div className="bg-white border border-gray-200 rounded-xl p-6">
-            <h3 className="text-lg font-semibold text-gray-800 mb-4">Quick Stats</h3>
+          <div className={`rounded-xl p-6 ${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
+            <h3 className={`text-lg font-semibold mb-4 ${darkMode ? 'text-white' : 'text-gray-800'}`}>Quick Stats</h3>
             <div className="space-y-4">
-              <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-                <div className="font-medium">Reports Generated</div>
-                <div className="text-xl font-bold text-[#008753]">12</div>
+              <div className={`flex justify-between items-center p-3 rounded-lg ${darkMode ? 'bg-gray-700' : 'bg-gray-50'}`}>
+                <div className={`font-medium ${darkMode ? 'text-gray-300' : ''}`}>Reports Generated</div>
+                <div className="text-xl font-bold text-[#008753] dark:text-green-400">12</div>
               </div>
-              <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-                <div className="font-medium">This Month</div>
-                <div className="text-xl font-bold text-blue-600">3</div>
+              <div className={`flex justify-between items-center p-3 rounded-lg ${darkMode ? 'bg-gray-700' : 'bg-gray-50'}`}>
+                <div className={`font-medium ${darkMode ? 'text-gray-300' : ''}`}>This Month</div>
+                <div className="text-xl font-bold text-blue-600 dark:text-blue-400">3</div>
               </div>
-              <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-                <div className="font-medium">Storage Used</div>
-                <div className="text-xl font-bold text-purple-600">24 MB</div>
+              <div className={`flex justify-between items-center p-3 rounded-lg ${darkMode ? 'bg-gray-700' : 'bg-gray-50'}`}>
+                <div className={`font-medium ${darkMode ? 'text-gray-300' : ''}`}>Storage Used</div>
+                <div className="text-xl font-bold text-purple-600 dark:text-purple-400">24 MB</div>
               </div>
             </div>
           </div>
 
-          <div className="bg-blue-50 border border-blue-200 rounded-xl p-6">
-            <h3 className="text-lg font-semibold text-blue-800 mb-4">Export Options</h3>
+          <div className={`rounded-xl p-6 ${darkMode ? 'bg-blue-900/30 border-blue-800' : 'bg-blue-50 border-blue-200'}`}>
+            <h3 className={`text-lg font-semibold mb-4 ${darkMode ? 'text-blue-400' : 'text-blue-800'}`}>Export Options</h3>
             <div className="space-y-3">
-              <button className="w-full text-left p-3 bg-white border border-blue-200 rounded-lg hover:bg-blue-100">
-                <div className="font-medium text-blue-800">📄 PDF Format</div>
-                <div className="text-sm text-blue-600">High quality print version</div>
+              <button className={`w-full text-left p-3 rounded-lg ${darkMode ? 'bg-blue-900/20 border-blue-800 text-blue-300 hover:bg-blue-900/40' : 'bg-white border-blue-200 text-blue-800 hover:bg-blue-100'}`}>
+                <div className="font-medium">📄 PDF Format</div>
+                <div className={`text-sm ${darkMode ? 'text-blue-400' : 'text-blue-600'}`}>High quality print version</div>
               </button>
-              <button className="w-full text-left p-3 bg-white border border-blue-200 rounded-lg hover:bg-blue-100">
-                <div className="font-medium text-blue-800">📊 Excel Spreadsheet</div>
-                <div className="text-sm text-blue-600">Data analysis ready</div>
+              <button className={`w-full text-left p-3 rounded-lg ${darkMode ? 'bg-blue-900/20 border-blue-800 text-blue-300 hover:bg-blue-900/40' : 'bg-white border-blue-200 text-blue-800 hover:bg-blue-100'}`}>
+                <div className="font-medium">📊 Excel Spreadsheet</div>
+                <div className={`text-sm ${darkMode ? 'text-blue-400' : 'text-blue-600'}`}>Data analysis ready</div>
               </button>
-              <button className="w-full text-left p-3 bg-white border border-blue-200 rounded-lg hover:bg-blue-100">
-                <div className="font-medium text-blue-800">📈 CSV Data</div>
-                <div className="text-sm text-blue-600">Raw data export</div>
+              <button className={`w-full text-left p-3 rounded-lg ${darkMode ? 'bg-blue-900/20 border-blue-800 text-blue-300 hover:bg-blue-900/40' : 'bg-white border-blue-200 text-blue-800 hover:bg-blue-100'}`}>
+                <div className="font-medium">📈 CSV Data</div>
+                <div className={`text-sm ${darkMode ? 'text-blue-400' : 'text-blue-600'}`}>Raw data export</div>
               </button>
             </div>
           </div>
 
-          <div className="bg-green-50 border border-green-200 rounded-xl p-6">
-            <h3 className="text-lg font-semibold text-green-800 mb-4">Need Help?</h3>
-            <p className="text-green-700 mb-4">
+          <div className={`rounded-xl p-6 ${darkMode ? 'bg-green-900/30 border-green-800' : 'bg-green-50 border-green-200'}`}>
+            <h3 className={`text-lg font-semibold mb-4 ${darkMode ? 'text-green-400' : 'text-green-800'}`}>Need Help?</h3>
+            <p className={`mb-4 ${darkMode ? 'text-green-300' : 'text-green-700'}`}>
               Having trouble generating reports? Contact support for assistance.
             </p>
-            <button className="w-full bg-green-100 text-green-800 py-2 rounded-lg hover:bg-green-200 font-medium">
+            <button className={`w-full py-2 rounded-lg font-medium ${darkMode ? 'bg-green-900/30 text-green-400 hover:bg-green-900/50' : 'bg-green-100 text-green-800 hover:bg-green-200'}`}>
               Contact Support
             </button>
           </div>

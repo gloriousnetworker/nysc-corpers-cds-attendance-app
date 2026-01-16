@@ -1,7 +1,7 @@
 'use client';
 import { useState } from 'react';
 
-export default function HelpSection() {
+export default function HelpSection({ darkMode }) {
   const [activeCategory, setActiveCategory] = useState('general');
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -40,11 +40,11 @@ export default function HelpSection() {
     <div className="space-y-8">
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2 space-y-6">
-          <div className="bg-white border border-gray-200 rounded-xl p-6">
-            <h3 className="text-xl font-bold text-gray-800 mb-6">Frequently Asked Questions</h3>
+          <div className={`rounded-xl p-6 ${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
+            <h3 className={`text-xl font-bold mb-6 ${darkMode ? 'text-white' : 'text-gray-800'}`}>Frequently Asked Questions</h3>
             
             <div className="mb-6">
-              <div className="flex space-x-4 mb-6">
+              <div className="flex flex-wrap gap-4 mb-6">
                 {Object.keys(faqCategories).map(category => (
                   <button
                     key={category}
@@ -52,7 +52,7 @@ export default function HelpSection() {
                     className={`px-4 py-2 rounded-lg capitalize ${
                       activeCategory === category
                         ? 'bg-[#008753] text-white'
-                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                        : `${darkMode ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`
                     }`}
                   >
                     {category} FAQs
@@ -62,27 +62,27 @@ export default function HelpSection() {
 
               <div className="space-y-4">
                 {faqCategories[activeCategory].map((faq, index) => (
-                  <div key={index} className="border border-gray-200 rounded-lg overflow-hidden">
-                    <button className="w-full text-left p-4 bg-gray-50 hover:bg-gray-100 font-medium">
+                  <div key={index} className={`rounded-lg overflow-hidden ${darkMode ? 'border-gray-700' : 'border-gray-200'}`}>
+                    <button className={`w-full text-left p-4 font-medium ${darkMode ? 'bg-gray-700 hover:bg-gray-600 text-gray-300' : 'bg-gray-50 hover:bg-gray-100 text-gray-800'}`}>
                       {faq.question}
                     </button>
-                    <div className="p-4 bg-white">
-                      <p className="text-gray-600">{faq.answer}</p>
+                    <div className={`p-4 ${darkMode ? 'bg-gray-800' : 'bg-white'}`}>
+                      <p className={darkMode ? 'text-gray-400' : 'text-gray-600'}>{faq.answer}</p>
                     </div>
                   </div>
                 ))}
               </div>
             </div>
 
-            <div className="bg-blue-50 border border-blue-200 rounded-xl p-6">
-              <h4 className="text-lg font-semibold text-blue-800 mb-3">Search Help Articles</h4>
-              <div className="flex space-x-3">
+            <div className={`rounded-xl p-6 ${darkMode ? 'bg-blue-900/30 border-blue-800' : 'bg-blue-50 border-blue-200'}`}>
+              <h4 className={`text-lg font-semibold mb-3 ${darkMode ? 'text-blue-400' : 'text-blue-800'}`}>Search Help Articles</h4>
+              <div className="flex flex-col sm:flex-row gap-3">
                 <input
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="What do you need help with?"
-                  className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#008753] focus:border-transparent"
+                  className={`flex-1 px-4 py-3 rounded-lg focus:ring-2 focus:ring-[#008753] focus:border-transparent ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'border border-gray-300'}`}
                 />
                 <button className="px-6 py-3 bg-[#008753] text-white rounded-lg hover:bg-[#006b42] font-medium">
                   Search
@@ -91,21 +91,21 @@ export default function HelpSection() {
             </div>
           </div>
 
-          <div className="bg-white border border-gray-200 rounded-xl p-6">
-            <h3 className="text-xl font-bold text-gray-800 mb-6">Contact Support</h3>
+          <div className={`rounded-xl p-6 ${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
+            <h3 className={`text-xl font-bold mb-6 ${darkMode ? 'text-white' : 'text-gray-800'}`}>Contact Support</h3>
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {contactOptions.map((option, index) => (
-                <div key={index} className="border border-gray-200 rounded-xl p-6 hover:shadow-md transition">
+                <div key={index} className={`rounded-xl p-6 ${darkMode ? 'border-gray-700 hover:bg-gray-700' : 'border-gray-200 hover:shadow-md'}`}>
                   <div className="text-3xl mb-4">
                     {option.type === 'email' && '📧'}
                     {option.type === 'phone' && '📞'}
                     {option.type === 'whatsapp' && '💬'}
                   </div>
-                  <h4 className="font-bold text-gray-800 mb-2">{option.title}</h4>
-                  <div className="text-lg font-medium text-[#008753] mb-2">{option.detail}</div>
-                  <div className="text-sm text-gray-600">Response: {option.response}</div>
-                  <button className="mt-4 w-full py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 font-medium">
+                  <h4 className={`font-bold mb-2 ${darkMode ? 'text-white' : 'text-gray-800'}`}>{option.title}</h4>
+                  <div className="text-lg font-medium text-[#008753] dark:text-green-400 mb-2">{option.detail}</div>
+                  <div className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>Response: {option.response}</div>
+                  <button className={`mt-4 w-full py-2 rounded-lg font-medium ${darkMode ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}>
                     Contact Now
                   </button>
                 </div>
@@ -135,47 +135,47 @@ export default function HelpSection() {
             </div>
           </div>
 
-          <div className="bg-white border border-gray-200 rounded-xl p-6">
-            <h3 className="text-lg font-semibold text-gray-800 mb-4">Quick Links</h3>
+          <div className={`rounded-xl p-6 ${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
+            <h3 className={`text-lg font-semibold mb-4 ${darkMode ? 'text-white' : 'text-gray-800'}`}>Quick Links</h3>
             <div className="space-y-3">
-              <button className="w-full text-left p-3 border border-gray-200 rounded-lg hover:bg-gray-50">
-                <div className="font-medium text-gray-800">Report a Bug</div>
-                <div className="text-sm text-gray-600">Found an issue? Let us know</div>
+              <button className={`w-full text-left p-3 rounded-lg ${darkMode ? 'border-gray-700 text-gray-300 hover:bg-gray-700' : 'border-gray-200 hover:bg-gray-50'}`}>
+                <div className={`font-medium ${darkMode ? 'text-white' : 'text-gray-800'}`}>Report a Bug</div>
+                <div className={darkMode ? 'text-gray-400' : 'text-gray-600'}>Found an issue? Let us know</div>
               </button>
-              <button className="w-full text-left p-3 border border-gray-200 rounded-lg hover:bg-gray-50">
-                <div className="font-medium text-gray-800">Feature Request</div>
-                <div className="text-sm text-gray-600">Suggest new features</div>
+              <button className={`w-full text-left p-3 rounded-lg ${darkMode ? 'border-gray-700 text-gray-300 hover:bg-gray-700' : 'border-gray-200 hover:bg-gray-50'}`}>
+                <div className={`font-medium ${darkMode ? 'text-white' : 'text-gray-800'}`}>Feature Request</div>
+                <div className={darkMode ? 'text-gray-400' : 'text-gray-600'}>Suggest new features</div>
               </button>
-              <button className="w-full text-left p-3 border border-gray-200 rounded-lg hover:bg-gray-50">
-                <div className="font-medium text-gray-800">System Status</div>
-                <div className="text-sm text-gray-600">Check service availability</div>
+              <button className={`w-full text-left p-3 rounded-lg ${darkMode ? 'border-gray-700 text-gray-300 hover:bg-gray-700' : 'border-gray-200 hover:bg-gray-50'}`}>
+                <div className={`font-medium ${darkMode ? 'text-white' : 'text-gray-800'}`}>System Status</div>
+                <div className={darkMode ? 'text-gray-400' : 'text-gray-600'}>Check service availability</div>
               </button>
             </div>
           </div>
 
-          <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-6">
-            <h3 className="text-lg font-semibold text-yellow-800 mb-4">⚠️ Urgent Help</h3>
-            <p className="text-yellow-700 mb-4">
+          <div className={`rounded-xl p-6 ${darkMode ? 'bg-yellow-900/30 border-yellow-800' : 'bg-yellow-50 border-yellow-200'}`}>
+            <h3 className={`text-lg font-semibold mb-4 ${darkMode ? 'text-yellow-400' : 'text-yellow-800'}`}>⚠️ Urgent Help</h3>
+            <p className={`mb-4 ${darkMode ? 'text-yellow-300' : 'text-yellow-700'}`}>
               Need immediate assistance with critical issues?
             </p>
-            <button className="w-full bg-yellow-100 text-yellow-800 py-3 rounded-lg hover:bg-yellow-200 font-bold">
+            <button className={`w-full py-3 rounded-lg font-bold ${darkMode ? 'bg-yellow-900/30 text-yellow-400 hover:bg-yellow-900/50' : 'bg-yellow-100 text-yellow-800 hover:bg-yellow-200'}`}>
               Emergency Support
             </button>
           </div>
 
-          <div className="bg-blue-50 border border-blue-200 rounded-xl p-6">
-            <h3 className="text-lg font-semibold text-blue-800 mb-4">Live Chat</h3>
-            <p className="text-blue-700 mb-4">
+          <div className={`rounded-xl p-6 ${darkMode ? 'bg-blue-900/30 border-blue-800' : 'bg-blue-50 border-blue-200'}`}>
+            <h3 className={`text-lg font-semibold mb-4 ${darkMode ? 'text-blue-400' : 'text-blue-800'}`}>Live Chat</h3>
+            <p className={`mb-4 ${darkMode ? 'text-blue-300' : 'text-blue-700'}`}>
               Chat with our support team in real-time
             </p>
-            <button className="w-full bg-blue-100 text-blue-800 py-3 rounded-lg hover:bg-blue-200 font-medium">
+            <button className={`w-full py-3 rounded-lg font-medium ${darkMode ? 'bg-blue-900/30 text-blue-400 hover:bg-blue-900/50' : 'bg-blue-100 text-blue-800 hover:bg-blue-200'}`}>
               💬 Start Live Chat
             </button>
           </div>
 
-          <div className="bg-gray-50 border border-gray-200 rounded-xl p-6">
-            <h3 className="text-lg font-semibold text-gray-800 mb-4">Support Hours</h3>
-            <div className="space-y-2 text-gray-600">
+          <div className={`rounded-xl p-6 ${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-gray-50 border-gray-200'}`}>
+            <h3 className={`text-lg font-semibold mb-4 ${darkMode ? 'text-white' : 'text-gray-800'}`}>Support Hours</h3>
+            <div className={`space-y-2 ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
               <div className="flex justify-between">
                 <span>Monday - Friday:</span>
                 <span className="font-medium">9:00 AM - 6:00 PM</span>
@@ -186,7 +186,7 @@ export default function HelpSection() {
               </div>
               <div className="flex justify-between">
                 <span>Sunday:</span>
-                <span className="font-medium text-red-600">Closed</span>
+                <span className="font-medium text-red-600 dark:text-red-400">Closed</span>
               </div>
             </div>
           </div>

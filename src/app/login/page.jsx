@@ -10,7 +10,14 @@ export default function LoginPage() {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [showStateSelection, setShowStateSelection] = useState(false);
   const router = useRouter();
+
+  const states = [
+    { id: 'fct', name: 'FCT', label: 'Federal Capital Territory', route: '/nysc/fct/corpers-dashboard' },
+    { id: 'lagos-state', name: 'LAGOS', label: 'Lagos State', route: '/nysc/lagos-state/corpers-dashboard' },
+    { id: 'kogi-state', name: 'KOGI', label: 'Kogi State', route: '/nysc/kogi-state/corpers-dashboard' }
+  ];
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -61,6 +68,10 @@ export default function LoginPage() {
   };
 
   const handleDemoLogin = () => {
+    setShowStateSelection(true);
+  };
+
+  const handleStateSelect = (stateRoute) => {
     localStorage.setItem('nysc_token', 'demo-token-12345');
     const mockUserData = {
       firstName: 'John',
@@ -75,7 +86,11 @@ export default function LoginPage() {
       cdsGroup: 'Education'
     };
     localStorage.setItem('nysc_user', JSON.stringify(mockUserData));
-    router.push('/corpers-dashboard');
+    router.push(stateRoute);
+  };
+
+  const handleBackToMain = () => {
+    setShowStateSelection(false);
   };
 
   return (
@@ -106,74 +121,103 @@ export default function LoginPage() {
           <p className="text-gray-600 text-2xl">Login to access your attendance records</p>
         </div>
         
-        <form onSubmit={handleSubmit} className="space-y-10">
-          {error && (
-            <div className="bg-red-50 text-red-600 p-5 rounded-lg text-lg">
-              {error}
-            </div>
-          )}
-          
-          <div>
-            <label className="block text-2xl font-semibold text-gray-800 mb-4">
-              Email or State Code
-            </label>
-            <input
-              type="text"
-              name="identifier"
-              value={formData.identifier}
-              onChange={handleChange}
-              className="w-full rounded-xl border-2 border-gray-300 px-5 py-5 text-xl focus:outline-none focus:ring-4 focus:ring-[#008753] focus:border-transparent"
-              placeholder="Enter your email or state code"
-              required
-            />
-          </div>
-          
-          <div>
-            <label className="block text-2xl font-semibold text-gray-800 mb-4">
-              Password
-            </label>
-            <input
-              type="password"
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              className="w-full rounded-xl border-2 border-gray-300 px-5 py-5 text-xl focus:outline-none focus:ring-4 focus:ring-[#008753] focus:border-transparent"
-              placeholder="Enter your password"
-              required
-            />
-          </div>
-          
-          <div className="text-right">
-            <Link href="/forgot-password" className="text-xl text-[#008753] hover:underline font-medium">
-              Forgot Password?
-            </Link>
-          </div>
-          
-          <button 
-            type="submit" 
-            className="w-full rounded-xl bg-[#008753] text-white font-bold py-5 text-2xl hover:bg-[#006b42] focus:outline-none focus:ring-4 focus:ring-[#008753] transition-all duration-300 transform hover:scale-[1.02] shadow-lg"
-            disabled={loading}
-          >
-            {loading ? 'Logging in...' : 'Login'}
-          </button>
-          
-          <div className="text-center pt-8">
-            <button
-              type="button"
-              onClick={handleDemoLogin}
-              className="w-full bg-gray-100 text-gray-800 font-bold py-5 text-xl rounded-xl hover:bg-gray-200 transition mb-8 shadow-md"
-            >
-              Quick Demo Login
-            </button>
+        {!showStateSelection ? (
+          <form onSubmit={handleSubmit} className="space-y-10">
+            {error && (
+              <div className="bg-red-50 text-red-600 p-5 rounded-lg text-lg">
+                {error}
+              </div>
+            )}
             
-            <div className="border-t pt-8">
-              <span className="text-gray-600 text-xl">Don't have an account? </span>
-              <Link href="/signup" className="text-[#008753] font-bold text-xl hover:underline ml-2">
-                Sign up here
+            <div>
+              <label className="block text-2xl font-semibold text-gray-800 mb-4">
+                Email or State Code
+              </label>
+              <input
+                type="text"
+                name="identifier"
+                value={formData.identifier}
+                onChange={handleChange}
+                className="w-full rounded-xl border-2 border-gray-300 px-5 py-5 text-xl focus:outline-none focus:ring-4 focus:ring-[#008753] focus:border-transparent"
+                placeholder="Enter your email or state code"
+                required
+              />
+            </div>
+            
+            <div>
+              <label className="block text-2xl font-semibold text-gray-800 mb-4">
+                Password
+              </label>
+              <input
+                type="password"
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
+                className="w-full rounded-xl border-2 border-gray-300 px-5 py-5 text-xl focus:outline-none focus:ring-4 focus:ring-[#008753] focus:border-transparent"
+                placeholder="Enter your password"
+                required
+              />
+            </div>
+            
+            <div className="text-right">
+              <Link href="/forgot-password" className="text-xl text-[#008753] hover:underline font-medium">
+                Forgot Password?
               </Link>
             </div>
+            
+            <button 
+              type="submit" 
+              className="w-full rounded-xl bg-[#008753] text-white font-bold py-5 text-2xl hover:bg-[#006b42] focus:outline-none focus:ring-4 focus:ring-[#008753] transition-all duration-300 transform hover:scale-[1.02] shadow-lg"
+              disabled={loading}
+            >
+              {loading ? 'Logging in...' : 'Login'}
+            </button>
+            
+            <div className="text-center pt-8">
+              <button
+                type="button"
+                onClick={handleDemoLogin}
+                className="w-full bg-gray-100 text-gray-800 font-bold py-5 text-xl rounded-xl hover:bg-gray-200 transition mb-8 shadow-md"
+              >
+                Quick Demo Login
+              </button>
+              
+              <div className="border-t pt-8">
+                <span className="text-gray-600 text-xl">Don't have an account? </span>
+                <Link href="/signup" className="text-[#008753] font-bold text-xl hover:underline ml-2">
+                  Sign up here
+                </Link>
+              </div>
+            </div>
+          </form>
+        ) : (
+          <div className="space-y-8">
+            <div className="text-center mb-8">
+              <h2 className="text-3xl font-bold text-[#008753] mb-2">Select State</h2>
+              <p className="text-gray-600 text-xl">Choose your state dashboard</p>
+            </div>
+            
+            <div className="grid grid-cols-1 gap-6">
+              {states.map((state) => (
+                <button
+                  key={state.id}
+                  onClick={() => handleStateSelect(state.route)}
+                  className="w-full rounded-xl border-2 border-gray-300 bg-white px-5 py-6 text-2xl text-[#008753] font-bold hover:bg-gray-50 hover:border-[#008753] transition-all duration-300 transform hover:scale-[1.02] shadow-md"
+                >
+                  <div className="text-3xl mb-2">{state.name}</div>
+                  <div className="text-lg text-gray-600">{state.label}</div>
+                </button>
+              ))}
+            </div>
+            
+            <button
+              onClick={handleBackToMain}
+              className="w-full rounded-xl border-2 border-gray-300 bg-transparent text-gray-800 font-bold py-4 text-xl hover:bg-gray-100 transition shadow-md"
+            >
+              ← Back to Login
+            </button>
           </div>
-        </form>
+        )}
       </div>
     </div>
   );

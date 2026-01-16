@@ -1,9 +1,9 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import DashboardNavbar from '../../components/dashboard/main-dashboard/DashboardNavbar';
-import DashboardSidebar from '../../components/dashboard/main-dashboard/DashboardSidebar';
-import DashboardContent from '../../components/dashboard/main-dashboard/DashboardContent';
+import DashboardNavbar from '../../../../components/dashboard/fct-dashboard/DashboardNavbar';
+import DashboardSidebar from '../../../../components/dashboard/fct-dashboard/DashboardSidebar';
+import DashboardContent from '../../../../components/dashboard/fct-dashboard/DashboardContent';
 
 export default function CorpersDashboard() {
   const [userData, setUserData] = useState(null);

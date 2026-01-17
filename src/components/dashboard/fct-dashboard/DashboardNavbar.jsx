@@ -32,8 +32,8 @@ export default function DashboardNavbar({ userData, onLogout, activeSection, set
                 />
               </div>
               <div>
-                <div className="font-bold text-lg text-[#008753] dark:text-green-400">NYSC Dashboard</div>
-                <div className="text-xs text-gray-600 dark:text-gray-400">CDS Attendance Portal</div>
+                <div className="font-bold text-lg text-[#008753] dark:text-green-400">FCT NYSC Dashboard</div>
+                <div className="text-xs text-gray-600 dark:text-gray-400">Federal Capital Territory Corper</div>
               </div>
             </div>
           </div>
@@ -58,6 +58,11 @@ export default function DashboardNavbar({ userData, onLogout, activeSection, set
           </div>
 
           <div className="flex items-center space-x-3">
+            <div className="hidden sm:flex items-center space-x-2 px-3 py-1 bg-blue-50 dark:bg-blue-900/30 rounded-lg">
+              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+              <span className="text-xs font-medium text-blue-700 dark:text-blue-300">Zone {userData?.cdsZone || '4'}</span>
+            </div>
+            
             <button
               onClick={toggleDarkMode}
               className="p-2 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 transition"
@@ -72,7 +77,7 @@ export default function DashboardNavbar({ userData, onLogout, activeSection, set
                 <div className="text-xs text-gray-600 dark:text-gray-300">{userData?.stateCode}</div>
               </div>
               <div className="w-8 h-8 bg-[#008753] rounded-full flex items-center justify-center text-white font-bold text-sm">
-                {userData?.fullName?.charAt(0) || 'J'}
+                {userData?.fullName?.charAt(0) || 'C'}
               </div>
             </div>
             
@@ -96,6 +101,11 @@ export default function DashboardNavbar({ userData, onLogout, activeSection, set
 
         {mobileMenuOpen && (
           <div className="md:hidden py-4 border-t border-gray-200 dark:border-gray-700">
+            <div className="flex items-center justify-center mb-4">
+              <div className="px-3 py-1 bg-blue-50 dark:bg-blue-900/30 rounded-lg">
+                <span className="text-sm font-medium text-blue-700 dark:text-blue-300">FCT Zone {userData?.cdsZone || '4'}</span>
+              </div>
+            </div>
             <div className="grid grid-cols-3 gap-2 mb-4">
               {navSections.map(section => (
                 <button
@@ -119,7 +129,7 @@ export default function DashboardNavbar({ userData, onLogout, activeSection, set
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-3">
                   <div className="w-8 h-8 bg-[#008753] rounded-full flex items-center justify-center text-white font-bold">
-                    {userData?.fullName?.charAt(0) || 'J'}
+                    {userData?.fullName?.charAt(0) || 'C'}
                   </div>
                   <div>
                     <div className="font-semibold text-gray-800 dark:text-white text-sm">{userData?.fullName}</div>

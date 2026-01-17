@@ -5,7 +5,7 @@ import DashboardNavbar from '../../../../components/dashboard/fct-dashboard/Dash
 import DashboardSidebar from '../../../../components/dashboard/fct-dashboard/DashboardSidebar';
 import DashboardContent from '../../../../components/dashboard/fct-dashboard/DashboardContent';
 
-export default function CorpersDashboard() {
+export default function FCTCorpersDashboard() {
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [activeSection, setActiveSection] = useState('overview');
@@ -18,53 +18,64 @@ export default function CorpersDashboard() {
       const storedUser = localStorage.getItem('nysc_user');
       
       if (!token || !storedUser) {
-        const mockUserData = {
-          userId: 'CORP-001',
-          firstName: 'John',
-          lastName: 'Doe',
-          fullName: 'John Doe',
-          email: 'john.doe@nysc.gov.ng',
-          stateCode: 'AB/21C/1234',
-          cdsGroup: 'ICT Group',
-          servingState: 'Abuja',
-          ppa: 'Ministry of Education',
-          batch: 'Batch A',
-          stream: 'Stream I',
-          attendanceRate: '85%',
-          daysPresent: 41,
-          daysAbsent: 7,
+        const fctUserData = {
+          userId: 'FCT-001',
+          firstName: 'Chinedu',
+          lastName: 'Okoro',
+          fullName: 'Chinedu Okoro',
+          email: 'chinedu.okoro@nysc.gov.ng',
+          stateCode: 'FCT/22C/5678',
+          cdsGroup: 'FCT ICT Group',
+          servingState: 'FCT Abuja',
+          ppa: 'Federal Ministry of Education',
+          lga: 'Abuja Municipal',
+          cdsZone: 'Zone 4',
+          batch: 'Batch B',
+          stream: 'Stream II',
+          attendanceRate: '92%',
+          daysPresent: 44,
+          daysAbsent: 4,
           totalDays: 48,
+          cdsLocation: 'Area 11 Secretariat',
           createdAt: new Date().toISOString()
         };
 
-        localStorage.setItem('nysc_token', 'demo_user_token_' + Date.now());
-        localStorage.setItem('nysc_user', JSON.stringify(mockUserData));
-        setUserData(mockUserData);
+        localStorage.setItem('nysc_token', 'fct_user_token_' + Date.now());
+        localStorage.setItem('nysc_user', JSON.stringify(fctUserData));
+        setUserData(fctUserData);
       } else {
         try {
           const user = JSON.parse(storedUser);
+          if (!user.cdsZone) {
+            user.cdsZone = 'Zone 4';
+            user.lga = 'Abuja Municipal';
+            user.cdsLocation = 'Area 11 Secretariat';
+          }
           setUserData(user);
         } catch (error) {
-          const mockUserData = {
-            userId: 'CORP-001',
-            firstName: 'John',
-            lastName: 'Doe',
-            fullName: 'John Doe',
-            email: 'john.doe@nysc.gov.ng',
-            stateCode: 'AB/21C/1234',
-            cdsGroup: 'ICT Group',
-            servingState: 'Abuja',
-            ppa: 'Ministry of Education',
-            batch: 'Batch A',
-            stream: 'Stream I',
-            attendanceRate: '85%',
-            daysPresent: 41,
-            daysAbsent: 7,
+          const fctUserData = {
+            userId: 'FCT-001',
+            firstName: 'Chinedu',
+            lastName: 'Okoro',
+            fullName: 'Chinedu Okoro',
+            email: 'chinedu.okoro@nysc.gov.ng',
+            stateCode: 'FCT/22C/5678',
+            cdsGroup: 'FCT ICT Group',
+            servingState: 'FCT Abuja',
+            ppa: 'Federal Ministry of Education',
+            lga: 'Abuja Municipal',
+            cdsZone: 'Zone 4',
+            batch: 'Batch B',
+            stream: 'Stream II',
+            attendanceRate: '92%',
+            daysPresent: 44,
+            daysAbsent: 4,
             totalDays: 48,
+            cdsLocation: 'Area 11 Secretariat',
             createdAt: new Date().toISOString()
           };
-          setUserData(mockUserData);
-          localStorage.setItem('nysc_user', JSON.stringify(mockUserData));
+          setUserData(fctUserData);
+          localStorage.setItem('nysc_user', JSON.stringify(fctUserData));
         }
       }
 
@@ -116,7 +127,7 @@ export default function CorpersDashboard() {
       <div className="min-h-screen flex items-center justify-center bg-white dark:bg-gray-900">
         <div className="text-center">
           <div className="h-12 w-12 border-4 border-t-4 border-gray-300 border-t-[#008753] rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600 dark:text-gray-300">Loading Dashboard...</p>
+          <p className="text-gray-600 dark:text-gray-300">Loading FCT Dashboard...</p>
         </div>
       </div>
     );
@@ -139,6 +150,7 @@ export default function CorpersDashboard() {
             activeSection={activeSection}
             setActiveSection={setActiveSection}
             darkMode={darkMode}
+            userData={userData}
           />
           
           <main className="flex-1 p-4 md:p-6 lg:p-8">

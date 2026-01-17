@@ -3,31 +3,40 @@ import { useState } from 'react';
 
 export default function OverviewSection({ userData, darkMode }) {
   const [stats] = useState([
-    { label: 'Total CDS Days', value: '48', change: '+5%', icon: '📅', color: 'bg-blue-500' },
-    { label: 'Attendance Rate', value: '85%', change: '+2%', icon: '📊', color: 'bg-green-500' },
-    { label: 'Days Present', value: '41', change: '+3', icon: '✅', color: 'bg-purple-500' },
-    { label: 'Days Absent', value: '7', change: '-2', icon: '❌', color: 'bg-red-500' },
-    { label: 'Wallet Balance', value: '₦5,250', change: '+₦500', icon: '💰', color: 'bg-yellow-500' },
-    { label: 'Market Items', value: '3', change: '+1', icon: '🛍️', color: 'bg-pink-500' }
+    { label: 'Total CDS Days', value: '48', change: '+5%', icon: '📅', color: 'bg-gradient-to-r from-blue-500 to-cyan-500' },
+    { label: 'Attendance Rate', value: '88%', change: '+3%', icon: '📊', color: 'bg-gradient-to-r from-green-500 to-emerald-500' },
+    { label: 'Days Present', value: '42', change: '+3', icon: '✅', color: 'bg-gradient-to-r from-purple-500 to-pink-500' },
+    { label: 'Days Absent', value: '6', change: '-2', icon: '❌', color: 'bg-gradient-to-r from-red-500 to-orange-500' },
+    { label: 'Wallet Balance', value: '₦6,800', change: '+₦800', icon: '💰', color: 'bg-gradient-to-r from-yellow-500 to-amber-500' },
+    { label: 'Market Items', value: '5', change: '+2', icon: '🛍️', color: 'bg-gradient-to-r from-pink-500 to-rose-500' }
   ]);
 
   const [recentActivities] = useState([
-    { date: 'Today', activity: 'Attendance marked for CDS meeting', status: 'Present', type: 'attendance' },
-    { date: 'Yesterday', activity: 'Sold iPhone on Marketplace', status: 'Sold', type: 'marketplace' },
-    { date: '2 days ago', activity: 'Updated profile information', status: 'Updated', type: 'profile' },
-    { date: '1 week ago', activity: 'Downloaded attendance report', status: 'Downloaded', type: 'reports' },
-    { date: '1 week ago', activity: 'Bought textbooks on Marketplace', status: 'Purchased', type: 'marketplace' }
+    { date: 'Today', activity: 'Attendance marked at Ikeja Secretariat', status: 'Present', type: 'attendance' },
+    { date: 'Yesterday', activity: 'Sold laptop on Lagos Marketplace', status: 'Sold', type: 'marketplace' },
+    { date: '2 days ago', activity: 'Updated Lagos profile information', status: 'Updated', type: 'profile' },
+    { date: '1 week ago', activity: 'Downloaded Lagos attendance report', status: 'Downloaded', type: 'reports' },
+    { date: '1 week ago', activity: 'Bought Lagos transit card', status: 'Purchased', type: 'marketplace' }
   ]);
 
   const [quickActions] = useState([
-    { title: 'Mark Attendance', description: 'Mark today\'s CDS attendance', icon: '📝', color: 'bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400' },
-    { title: 'Browse Marketplace', description: 'View items for sale', icon: '🛍️', color: 'bg-pink-100 dark:bg-pink-900/30 text-pink-600 dark:text-pink-400' },
-    { title: 'Pay CDS Dues', description: 'Make dues payment', icon: '💰', color: 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-600 dark:text-yellow-400' },
-    { title: 'View Schedule', description: 'Check CDS schedule', icon: '📅', color: 'bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400' }
+    { title: 'Mark Attendance', description: 'Mark today\'s CDS attendance', icon: '📝', color: 'bg-gradient-to-r from-green-500 to-emerald-500 text-white' },
+    { title: 'Browse Marketplace', description: 'View Lagos corpers market', icon: '🛍️', color: 'bg-gradient-to-r from-pink-500 to-rose-500 text-white' },
+    { title: 'Pay CDS Dues', description: 'Make Lagos dues payment', icon: '💰', color: 'bg-gradient-to-r from-yellow-500 to-amber-500 text-white' },
+    { title: 'View Schedule', description: 'Check Lagos CDS schedule', icon: '📅', color: 'bg-gradient-to-r from-blue-500 to-cyan-500 text-white' }
+  ]);
+
+  const [lagosLGAs] = useState([
+    { lga: 'Ikeja', corpers: 85, status: 'High Activity' },
+    { lga: 'Surulere', corpers: 72, status: 'Active' },
+    { lga: 'Lagos Island', corpers: 68, status: 'Active' },
+    { lga: 'Eti-Osa', corpers: 45, status: 'Moderate' },
+    { lga: 'Alimosho', corpers: 92, status: 'High Activity' },
+    { lga: 'Kosofe', corpers: 58, status: 'Active' }
   ]);
 
   const handleQuickAction = (action) => {
-    alert(`Initiating: ${action.title}`);
+    alert(`Initiating: ${action.title} for Lagos`);
   };
 
   return (
@@ -52,7 +61,7 @@ export default function OverviewSection({ userData, darkMode }) {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2">
           <div className={`rounded-xl p-5 ${darkMode ? 'bg-gray-800' : 'bg-white border border-gray-200'}`}>
-            <h3 className="text-lg font-bold text-gray-800 dark:text-white mb-4">Quick Actions</h3>
+            <h3 className="text-lg font-bold text-gray-800 dark:text-white mb-4">Lagos Quick Actions</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {quickActions.map((action, index) => (
                 <button
@@ -64,25 +73,29 @@ export default function OverviewSection({ userData, darkMode }) {
                     <span className="text-xl mr-3">{action.icon}</span>
                     <div className="font-bold">{action.title}</div>
                   </div>
-                  <div className={`text-xs ${darkMode ? 'opacity-80' : 'opacity-90'}`}>{action.description}</div>
+                  <div className="text-xs opacity-90">{action.description}</div>
                 </button>
               ))}
             </div>
             
             <div className="mt-6 pt-5 border-t border-gray-200 dark:border-gray-700">
-              <h4 className="font-semibold text-gray-800 dark:text-white mb-3">Service Status</h4>
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <span className={`text-sm ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>NYSC Weeks Completed</span>
-                  <span className="text-xs font-medium text-green-600 dark:text-green-400">8 weeks</span>
+              <h4 className="font-semibold text-gray-800 dark:text-white mb-3">Lagos Service Status</h4>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="p-3 bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 rounded-lg">
+                  <div className="text-xs text-[#1EB2A6] dark:text-cyan-300">Your LGA</div>
+                  <div className="font-bold text-[#008753] dark:text-green-400">{userData?.lga || 'Ikeja'}</div>
                 </div>
-                <div className="flex items-center justify-between">
-                  <span className={`text-sm ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>Remaining Service</span>
-                  <span className="text-xs font-medium text-blue-600 dark:text-blue-400">24 weeks</span>
+                <div className="p-3 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-lg">
+                  <div className="text-xs text-green-700 dark:text-green-300">NYSC Weeks</div>
+                  <div className="font-bold text-green-800 dark:text-green-200">10 weeks</div>
                 </div>
-                <div className="flex items-center justify-between">
-                  <span className={`text-sm ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>Next CDS Meeting</span>
-                  <span className="text-xs font-medium text-purple-600 dark:text-purple-400">Wed, Mar 12</span>
+                <div className="p-3 bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-lg">
+                  <div className="text-xs text-purple-700 dark:text-purple-300">Remaining</div>
+                  <div className="font-bold text-purple-800 dark:text-purple-200">22 weeks</div>
+                </div>
+                <div className="p-3 bg-gradient-to-r from-yellow-50 to-amber-50 dark:from-yellow-900/20 dark:to-amber-900/20 rounded-lg">
+                  <div className="text-xs text-yellow-700 dark:text-yellow-300">Next Lagos CDS</div>
+                  <div className="font-bold text-yellow-800 dark:text-yellow-200">Mar 14</div>
                 </div>
               </div>
             </div>
@@ -90,15 +103,20 @@ export default function OverviewSection({ userData, darkMode }) {
         </div>
 
         <div className={`rounded-xl p-5 ${darkMode ? 'bg-gray-800' : 'bg-white border border-gray-200'}`}>
-          <h3 className="text-lg font-bold text-gray-800 dark:text-white mb-4">Recent Activities</h3>
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-bold text-gray-800 dark:text-white">Recent Activities</h3>
+            <span className="text-xs px-2 py-1 bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-blue-900/30 dark:to-cyan-900/30 text-[#1EB2A6] dark:text-cyan-300 rounded-full">
+              {userData?.lga || 'Ikeja'} LGA
+            </span>
+          </div>
           <div className="space-y-3">
             {recentActivities.map((activity, index) => (
               <div key={index} className={`flex items-start p-3 rounded-lg ${darkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-50'} transition`}>
                 <div className={`w-8 h-8 rounded-full mr-3 flex items-center justify-center ${
-                  activity.type === 'attendance' ? 'bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400' :
-                  activity.type === 'marketplace' ? 'bg-pink-100 dark:bg-pink-900/30 text-pink-600 dark:text-pink-400' :
-                  activity.type === 'profile' ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400' :
-                  'bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400'
+                  activity.type === 'attendance' ? 'bg-gradient-to-r from-green-500 to-emerald-500 text-white' :
+                  activity.type === 'marketplace' ? 'bg-gradient-to-r from-pink-500 to-rose-500 text-white' :
+                  activity.type === 'profile' ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white' :
+                  'bg-gradient-to-r from-blue-500 to-cyan-500 text-white'
                 }`}>
                   {activity.type === 'attendance' ? '📝' :
                    activity.type === 'marketplace' ? '🛍️' :
@@ -124,77 +142,105 @@ export default function OverviewSection({ userData, darkMode }) {
           </div>
           
           <button className="w-full mt-4 text-center text-sm text-[#008753] dark:text-green-400 hover:underline">
-            View All Activities →
+            View All Lagos Activities →
           </button>
         </div>
       </div>
 
-      <div className={`rounded-xl p-5 ${darkMode ? 'bg-gray-800' : 'bg-gradient-to-br from-[#008753] to-[#00a86b] text-white'}`}>
+      <div className={`rounded-xl p-5 ${darkMode ? 'bg-gray-800' : 'bg-gradient-to-br from-[#008753] via-[#1EB2A6] to-[#008753] text-white'}`}>
         <div className="flex flex-col md:flex-row md:items-center justify-between">
           <div>
-            <h3 className="text-xl font-bold mb-2">Welcome, {userData?.firstName}!</h3>
+            <div className="flex items-center gap-2 mb-2">
+              <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center">
+                🌉
+              </div>
+              <h3 className="text-xl font-bold">Welcome to Lagos, {userData?.firstName}!</h3>
+            </div>
             <p className="opacity-90">
-              You're currently serving in <span className="font-bold">{userData?.servingState}</span> State 
-              with <span className="font-bold">{userData?.cdsGroup}</span> CDS group.
+              Serving in <span className="font-bold">Center of Excellence</span> | 
+              LGA: <span className="font-bold">{userData?.lga || 'Ikeja'}</span> | 
+              Zone: <span className="font-bold">{userData?.cdsZone || '2'}</span>
+            </p>
+            <p className="opacity-90 mt-1">
+              CDS Group: <span className="font-bold">{userData?.cdsGroup}</span> at <span className="font-bold">{userData?.cdsLocation || 'Ikeja Secretariat'}</span>
             </p>
           </div>
           <div className="flex flex-wrap gap-3 mt-4 md:mt-0">
             <button className="bg-white text-[#008753] px-4 py-2 rounded-lg hover:bg-gray-100 transition font-bold text-sm">
-              View Marketplace
+              Lagos Marketplace
             </button>
             <button className="bg-white/20 text-white px-4 py-2 rounded-lg hover:bg-white/30 transition font-medium text-sm">
-              Check Schedule
+              Lagos Schedule
             </button>
           </div>
         </div>
         
         <div className="mt-6 grid grid-cols-2 md:grid-cols-4 gap-4">
           <div className="text-center p-4 bg-white/10 rounded-lg">
-            <div className="text-lg font-bold">8</div>
-            <div className="text-sm opacity-90">Weeks Completed</div>
+            <div className="text-lg font-bold">10</div>
+            <div className="text-sm opacity-90">Weeks in Lagos</div>
           </div>
           <div className="text-center p-4 bg-white/10 rounded-lg">
-            <div className="text-lg font-bold">24</div>
+            <div className="text-lg font-bold">22</div>
             <div className="text-sm opacity-90">Weeks Remaining</div>
           </div>
           <div className="text-center p-4 bg-white/10 rounded-lg">
-            <div className="text-lg font-bold">85%</div>
-            <div className="text-sm opacity-90">Attendance Rate</div>
+            <div className="text-lg font-bold">88%</div>
+            <div className="text-sm opacity-90">Lagos Attendance</div>
           </div>
           <div className="text-center p-4 bg-white/10 rounded-lg">
             <div className="text-lg font-bold">A</div>
-            <div className="text-sm opacity-90">Performance Grade</div>
+            <div className="text-sm opacity-90">Lagos Performance</div>
           </div>
         </div>
       </div>
 
       <div className={`rounded-xl p-5 ${darkMode ? 'bg-gray-800' : 'bg-white border border-gray-200'}`}>
-        <h3 className="text-lg font-bold text-gray-800 dark:text-white mb-4">CDS Performance Overview</h3>
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-lg font-bold text-gray-800 dark:text-white">Lagos LGAs Overview</h3>
+          <span className="text-xs font-medium text-[#008753] dark:text-green-400">Total: 420 Corpers</span>
+        </div>
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+          {lagosLGAs.map((lga, index) => (
+            <div key={index} className={`p-3 rounded-lg text-center ${lga.lga === (userData?.lga || 'Ikeja') ? 'bg-gradient-to-r from-[#008753] to-[#1EB2A6] text-white' : darkMode ? 'bg-gray-700' : 'bg-gray-50'}`}>
+              <div className="text-lg font-bold">{lga.lga}</div>
+              <div className="text-xs opacity-90">{lga.corpers} corpers</div>
+              <div className={`mt-2 text-xs px-2 py-1 rounded-full inline-block ${
+                lga.status === 'High Activity' ? 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400' :
+                lga.status === 'Active' ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400' :
+                'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400'
+              }`}>
+                {lga.status}
+              </div>
+            </div>
+          ))}
+        </div>
+        
+        <div className="mt-6 grid grid-cols-2 md:grid-cols-5 gap-4">
           <div className="text-center">
             <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">48</div>
-            <div className="text-sm text-gray-600 dark:text-gray-400">Total Days</div>
+            <div className="text-sm text-gray-600 dark:text-gray-400">Lagos Days</div>
             <div className="text-xs text-green-600 dark:text-green-400 mt-1">↑ 5%</div>
           </div>
           <div className="text-center">
-            <div className="text-2xl font-bold text-green-600 dark:text-green-400">41</div>
+            <div className="text-2xl font-bold text-green-600 dark:text-green-400">42</div>
             <div className="text-sm text-gray-600 dark:text-gray-400">Present</div>
             <div className="text-xs text-green-600 dark:text-green-400 mt-1">↑ 3</div>
           </div>
           <div className="text-center">
-            <div className="text-2xl font-bold text-red-600 dark:text-red-400">7</div>
+            <div className="text-2xl font-bold text-red-600 dark:text-red-400">6</div>
             <div className="text-sm text-gray-600 dark:text-gray-400">Absent</div>
             <div className="text-xs text-green-600 dark:text-green-400 mt-1">↓ 2</div>
           </div>
           <div className="text-center">
-            <div className="text-2xl font-bold text-yellow-600 dark:text-yellow-400">₦5,250</div>
+            <div className="text-2xl font-bold text-yellow-600 dark:text-yellow-400">₦6,800</div>
             <div className="text-sm text-gray-600 dark:text-gray-400">Wallet</div>
-            <div className="text-xs text-green-600 dark:text-green-400 mt-1">↑ ₦500</div>
+            <div className="text-xs text-green-600 dark:text-green-400 mt-1">↑ ₦800</div>
           </div>
           <div className="text-center">
-            <div className="text-2xl font-bold text-pink-600 dark:text-pink-400">3</div>
+            <div className="text-2xl font-bold text-pink-600 dark:text-pink-400">5</div>
             <div className="text-sm text-gray-600 dark:text-gray-400">Listings</div>
-            <div className="text-xs text-green-600 dark:text-green-400 mt-1">↑ 1</div>
+            <div className="text-xs text-green-600 dark:text-green-400 mt-1">↑ 2</div>
           </div>
         </div>
       </div>

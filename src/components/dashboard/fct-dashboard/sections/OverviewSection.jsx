@@ -4,15 +4,15 @@ import { useState } from 'react';
 export default function OverviewSection({ userData, darkMode }) {
   const [stats] = useState([
     { label: 'Total CDS Days', value: '48', change: '+5%', icon: '📅', color: 'bg-blue-500' },
-    { label: 'Attendance Rate', value: '85%', change: '+2%', icon: '📊', color: 'bg-green-500' },
-    { label: 'Days Present', value: '41', change: '+3', icon: '✅', color: 'bg-purple-500' },
-    { label: 'Days Absent', value: '7', change: '-2', icon: '❌', color: 'bg-red-500' },
+    { label: 'Attendance Rate', value: '92%', change: '+2%', icon: '📊', color: 'bg-green-500' },
+    { label: 'Days Present', value: '44', change: '+3', icon: '✅', color: 'bg-purple-500' },
+    { label: 'Days Absent', value: '4', change: '-2', icon: '❌', color: 'bg-red-500' },
     { label: 'Wallet Balance', value: '₦5,250', change: '+₦500', icon: '💰', color: 'bg-yellow-500' },
     { label: 'Market Items', value: '3', change: '+1', icon: '🛍️', color: 'bg-pink-500' }
   ]);
 
   const [recentActivities] = useState([
-    { date: 'Today', activity: 'Attendance marked for CDS meeting', status: 'Present', type: 'attendance' },
+    { date: 'Today', activity: 'Attendance marked at Zone 4 Secretariat', status: 'Present', type: 'attendance' },
     { date: 'Yesterday', activity: 'Sold iPhone on Marketplace', status: 'Sold', type: 'marketplace' },
     { date: '2 days ago', activity: 'Updated profile information', status: 'Updated', type: 'profile' },
     { date: '1 week ago', activity: 'Downloaded attendance report', status: 'Downloaded', type: 'reports' },
@@ -70,19 +70,23 @@ export default function OverviewSection({ userData, darkMode }) {
             </div>
             
             <div className="mt-6 pt-5 border-t border-gray-200 dark:border-gray-700">
-              <h4 className="font-semibold text-gray-800 dark:text-white mb-3">Service Status</h4>
+              <h4 className="font-semibold text-gray-800 dark:text-white mb-3">FCT Service Status</h4>
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <span className={`text-sm ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>NYSC Weeks Completed</span>
-                  <span className="text-xs font-medium text-green-600 dark:text-green-400">8 weeks</span>
+                  <span className="text-xs font-medium text-green-600 dark:text-green-400">12 weeks</span>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className={`text-sm ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>Remaining Service</span>
-                  <span className="text-xs font-medium text-blue-600 dark:text-blue-400">24 weeks</span>
+                  <span className="text-xs font-medium text-blue-600 dark:text-blue-400">20 weeks</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className={`text-sm ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>FCT Zone</span>
+                  <span className="text-xs font-medium text-purple-600 dark:text-purple-400">Zone {userData?.cdsZone || '4'}</span>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className={`text-sm ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>Next CDS Meeting</span>
-                  <span className="text-xs font-medium text-purple-600 dark:text-purple-400">Wed, Mar 12</span>
+                  <span className="text-xs font-medium text-yellow-600 dark:text-yellow-400">Wed, Mar 15</span>
                 </div>
               </div>
             </div>
@@ -132,10 +136,14 @@ export default function OverviewSection({ userData, darkMode }) {
       <div className={`rounded-xl p-5 ${darkMode ? 'bg-gray-800' : 'bg-gradient-to-br from-[#008753] to-[#00a86b] text-white'}`}>
         <div className="flex flex-col md:flex-row md:items-center justify-between">
           <div>
-            <h3 className="text-xl font-bold mb-2">Welcome, {userData?.firstName}!</h3>
+            <h3 className="text-xl font-bold mb-2">Welcome to FCT Abuja, {userData?.firstName}!</h3>
             <p className="opacity-90">
-              You're currently serving in <span className="font-bold">{userData?.servingState}</span> State 
+              You're currently serving in <span className="font-bold">Federal Capital Territory</span> 
               with <span className="font-bold">{userData?.cdsGroup}</span> CDS group.
+            </p>
+            <p className="opacity-90 mt-1">
+              Zone: <span className="font-bold">{userData?.cdsZone || '4'}</span> | 
+              LGA: <span className="font-bold">{userData?.lga || 'Abuja Municipal'}</span>
             </p>
           </div>
           <div className="flex flex-wrap gap-3 mt-4 md:mt-0">
@@ -150,15 +158,15 @@ export default function OverviewSection({ userData, darkMode }) {
         
         <div className="mt-6 grid grid-cols-2 md:grid-cols-4 gap-4">
           <div className="text-center p-4 bg-white/10 rounded-lg">
-            <div className="text-lg font-bold">8</div>
+            <div className="text-lg font-bold">12</div>
             <div className="text-sm opacity-90">Weeks Completed</div>
           </div>
           <div className="text-center p-4 bg-white/10 rounded-lg">
-            <div className="text-lg font-bold">24</div>
+            <div className="text-lg font-bold">20</div>
             <div className="text-sm opacity-90">Weeks Remaining</div>
           </div>
           <div className="text-center p-4 bg-white/10 rounded-lg">
-            <div className="text-lg font-bold">85%</div>
+            <div className="text-lg font-bold">92%</div>
             <div className="text-sm opacity-90">Attendance Rate</div>
           </div>
           <div className="text-center p-4 bg-white/10 rounded-lg">
@@ -177,12 +185,12 @@ export default function OverviewSection({ userData, darkMode }) {
             <div className="text-xs text-green-600 dark:text-green-400 mt-1">↑ 5%</div>
           </div>
           <div className="text-center">
-            <div className="text-2xl font-bold text-green-600 dark:text-green-400">41</div>
+            <div className="text-2xl font-bold text-green-600 dark:text-green-400">44</div>
             <div className="text-sm text-gray-600 dark:text-gray-400">Present</div>
             <div className="text-xs text-green-600 dark:text-green-400 mt-1">↑ 3</div>
           </div>
           <div className="text-center">
-            <div className="text-2xl font-bold text-red-600 dark:text-red-400">7</div>
+            <div className="text-2xl font-bold text-red-600 dark:text-red-400">4</div>
             <div className="text-sm text-gray-600 dark:text-gray-400">Absent</div>
             <div className="text-xs text-green-600 dark:text-green-400 mt-1">↓ 2</div>
           </div>

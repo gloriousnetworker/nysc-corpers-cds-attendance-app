@@ -5,7 +5,7 @@ import DashboardNavbar from '../../../../components/dashboard/kogi-state-dashboa
 import DashboardSidebar from '../../../../components/dashboard/kogi-state-dashboard/DashboardSidebar';
 import DashboardContent from '../../../../components/dashboard/kogi-state-dashboard/DashboardContent';
 
-export default function CorpersDashboard() {
+export default function KogiCorpersDashboard() {
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [activeSection, setActiveSection] = useState('overview');
@@ -18,53 +18,64 @@ export default function CorpersDashboard() {
       const storedUser = localStorage.getItem('nysc_user');
       
       if (!token || !storedUser) {
-        const mockUserData = {
-          userId: 'CORP-001',
-          firstName: 'John',
-          lastName: 'Doe',
-          fullName: 'John Doe',
-          email: 'john.doe@nysc.gov.ng',
-          stateCode: 'AB/21C/1234',
-          cdsGroup: 'ICT Group',
-          servingState: 'Abuja',
-          ppa: 'Ministry of Education',
-          batch: 'Batch A',
-          stream: 'Stream I',
-          attendanceRate: '85%',
-          daysPresent: 41,
-          daysAbsent: 7,
+        const kogiUserData = {
+          userId: 'KOG-001',
+          firstName: 'Abdul',
+          lastName: 'Mohammed',
+          fullName: 'Abdul Mohammed',
+          email: 'abdul.mohammed@nysc.gov.ng',
+          stateCode: 'KG/22B/4567',
+          cdsGroup: 'Kogi ICT Group',
+          servingState: 'Kogi',
+          ppa: 'Kogi State Ministry of Education',
+          lga: 'Lokoja',
+          cdsZone: 'Zone 3',
+          batch: 'Batch B',
+          stream: 'Stream II',
+          attendanceRate: '90%',
+          daysPresent: 43,
+          daysAbsent: 5,
           totalDays: 48,
+          cdsLocation: 'Lokoja Secretariat',
           createdAt: new Date().toISOString()
         };
 
-        localStorage.setItem('nysc_token', 'demo_user_token_' + Date.now());
-        localStorage.setItem('nysc_user', JSON.stringify(mockUserData));
-        setUserData(mockUserData);
+        localStorage.setItem('nysc_token', 'kogi_user_token_' + Date.now());
+        localStorage.setItem('nysc_user', JSON.stringify(kogiUserData));
+        setUserData(kogiUserData);
       } else {
         try {
           const user = JSON.parse(storedUser);
+          if (!user.lga) {
+            user.lga = 'Lokoja';
+            user.cdsZone = 'Zone 3';
+            user.cdsLocation = 'Lokoja Secretariat';
+          }
           setUserData(user);
         } catch (error) {
-          const mockUserData = {
-            userId: 'CORP-001',
-            firstName: 'John',
-            lastName: 'Doe',
-            fullName: 'John Doe',
-            email: 'john.doe@nysc.gov.ng',
-            stateCode: 'AB/21C/1234',
-            cdsGroup: 'ICT Group',
-            servingState: 'Abuja',
-            ppa: 'Ministry of Education',
-            batch: 'Batch A',
-            stream: 'Stream I',
-            attendanceRate: '85%',
-            daysPresent: 41,
-            daysAbsent: 7,
+          const kogiUserData = {
+            userId: 'KOG-001',
+            firstName: 'Abdul',
+            lastName: 'Mohammed',
+            fullName: 'Abdul Mohammed',
+            email: 'abdul.mohammed@nysc.gov.ng',
+            stateCode: 'KG/22B/4567',
+            cdsGroup: 'Kogi ICT Group',
+            servingState: 'Kogi',
+            ppa: 'Kogi State Ministry of Education',
+            lga: 'Lokoja',
+            cdsZone: 'Zone 3',
+            batch: 'Batch B',
+            stream: 'Stream II',
+            attendanceRate: '90%',
+            daysPresent: 43,
+            daysAbsent: 5,
             totalDays: 48,
+            cdsLocation: 'Lokoja Secretariat',
             createdAt: new Date().toISOString()
           };
-          setUserData(mockUserData);
-          localStorage.setItem('nysc_user', JSON.stringify(mockUserData));
+          setUserData(kogiUserData);
+          localStorage.setItem('nysc_user', JSON.stringify(kogiUserData));
         }
       }
 
@@ -115,8 +126,8 @@ export default function CorpersDashboard() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-white dark:bg-gray-900">
         <div className="text-center">
-          <div className="h-12 w-12 border-4 border-t-4 border-gray-300 border-t-[#008753] rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600 dark:text-gray-300">Loading Dashboard...</p>
+          <div className="h-12 w-12 border-4 border-t-4 border-gray-300 border-t-[#FFA500] rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-gray-600 dark:text-gray-300">Loading Kogi Dashboard...</p>
         </div>
       </div>
     );
@@ -139,6 +150,7 @@ export default function CorpersDashboard() {
             activeSection={activeSection}
             setActiveSection={setActiveSection}
             darkMode={darkMode}
+            userData={userData}
           />
           
           <main className="flex-1 p-4 md:p-6 lg:p-8">

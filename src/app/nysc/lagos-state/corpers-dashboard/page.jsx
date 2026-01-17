@@ -5,7 +5,7 @@ import DashboardNavbar from '../../../../components/dashboard/lagos-state-dashbo
 import DashboardSidebar from '../../../../components/dashboard/lagos-state-dashboard/DashboardSidebar';
 import DashboardContent from '../../../../components/dashboard/lagos-state-dashboard/DashboardContent';
 
-export default function CorpersDashboard() {
+export default function LagosCorpersDashboard() {
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [activeSection, setActiveSection] = useState('overview');
@@ -18,53 +18,64 @@ export default function CorpersDashboard() {
       const storedUser = localStorage.getItem('nysc_user');
       
       if (!token || !storedUser) {
-        const mockUserData = {
-          userId: 'CORP-001',
-          firstName: 'John',
-          lastName: 'Doe',
-          fullName: 'John Doe',
-          email: 'john.doe@nysc.gov.ng',
-          stateCode: 'AB/21C/1234',
-          cdsGroup: 'ICT Group',
-          servingState: 'Abuja',
-          ppa: 'Ministry of Education',
+        const lagosUserData = {
+          userId: 'LAG-001',
+          firstName: 'Temitope',
+          lastName: 'Adewale',
+          fullName: 'Temitope Adewale',
+          email: 'temitope.adewale@nysc.gov.ng',
+          stateCode: 'LA/23A/7890',
+          cdsGroup: 'Lagos ICT Group',
+          servingState: 'Lagos',
+          ppa: 'Lagos State Ministry of Education',
+          lga: 'Ikeja',
+          cdsZone: 'Zone 2',
           batch: 'Batch A',
           stream: 'Stream I',
-          attendanceRate: '85%',
-          daysPresent: 41,
-          daysAbsent: 7,
+          attendanceRate: '88%',
+          daysPresent: 42,
+          daysAbsent: 6,
           totalDays: 48,
+          cdsLocation: 'Ikeja Secretariat',
           createdAt: new Date().toISOString()
         };
 
-        localStorage.setItem('nysc_token', 'demo_user_token_' + Date.now());
-        localStorage.setItem('nysc_user', JSON.stringify(mockUserData));
-        setUserData(mockUserData);
+        localStorage.setItem('nysc_token', 'lagos_user_token_' + Date.now());
+        localStorage.setItem('nysc_user', JSON.stringify(lagosUserData));
+        setUserData(lagosUserData);
       } else {
         try {
           const user = JSON.parse(storedUser);
+          if (!user.lga) {
+            user.lga = 'Ikeja';
+            user.cdsZone = 'Zone 2';
+            user.cdsLocation = 'Ikeja Secretariat';
+          }
           setUserData(user);
         } catch (error) {
-          const mockUserData = {
-            userId: 'CORP-001',
-            firstName: 'John',
-            lastName: 'Doe',
-            fullName: 'John Doe',
-            email: 'john.doe@nysc.gov.ng',
-            stateCode: 'AB/21C/1234',
-            cdsGroup: 'ICT Group',
-            servingState: 'Abuja',
-            ppa: 'Ministry of Education',
+          const lagosUserData = {
+            userId: 'LAG-001',
+            firstName: 'Temitope',
+            lastName: 'Adewale',
+            fullName: 'Temitope Adewale',
+            email: 'temitope.adewale@nysc.gov.ng',
+            stateCode: 'LA/23A/7890',
+            cdsGroup: 'Lagos ICT Group',
+            servingState: 'Lagos',
+            ppa: 'Lagos State Ministry of Education',
+            lga: 'Ikeja',
+            cdsZone: 'Zone 2',
             batch: 'Batch A',
             stream: 'Stream I',
-            attendanceRate: '85%',
-            daysPresent: 41,
-            daysAbsent: 7,
+            attendanceRate: '88%',
+            daysPresent: 42,
+            daysAbsent: 6,
             totalDays: 48,
+            cdsLocation: 'Ikeja Secretariat',
             createdAt: new Date().toISOString()
           };
-          setUserData(mockUserData);
-          localStorage.setItem('nysc_user', JSON.stringify(mockUserData));
+          setUserData(lagosUserData);
+          localStorage.setItem('nysc_user', JSON.stringify(lagosUserData));
         }
       }
 
@@ -116,7 +127,7 @@ export default function CorpersDashboard() {
       <div className="min-h-screen flex items-center justify-center bg-white dark:bg-gray-900">
         <div className="text-center">
           <div className="h-12 w-12 border-4 border-t-4 border-gray-300 border-t-[#008753] rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600 dark:text-gray-300">Loading Dashboard...</p>
+          <p className="text-gray-600 dark:text-gray-300">Loading Lagos Dashboard...</p>
         </div>
       </div>
     );
@@ -139,6 +150,7 @@ export default function CorpersDashboard() {
             activeSection={activeSection}
             setActiveSection={setActiveSection}
             darkMode={darkMode}
+            userData={userData}
           />
           
           <main className="flex-1 p-4 md:p-6 lg:p-8">

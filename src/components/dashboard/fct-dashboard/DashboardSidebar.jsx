@@ -1,7 +1,7 @@
 'use client';
 import { useState } from 'react';
 
-export default function DashboardSidebar({ activeSection, setActiveSection, darkMode }) {
+export default function DashboardSidebar({ activeSection, setActiveSection, darkMode, userData }) {
   const [collapsed, setCollapsed] = useState(false);
 
   const menuItems = [
@@ -54,7 +54,13 @@ export default function DashboardSidebar({ activeSection, setActiveSection, dark
       
       {!collapsed && (
         <div className={`p-4 border-t ${darkMode ? 'border-gray-700' : 'border-gray-200'} mt-4`}>
-          <div className={`text-xs font-semibold mb-2 ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>QUICK ACTIONS</div>
+          <div className={`text-xs font-semibold mb-2 ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>FCT INFORMATION</div>
+          <div className="mb-3 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+            <div className="text-xs text-blue-700 dark:text-blue-300 mb-1">FCT Zone</div>
+            <div className="font-bold text-blue-800 dark:text-blue-200">Zone {userData?.cdsZone || '4'}</div>
+            <div className="text-xs text-blue-600 dark:text-blue-400 mt-1">{userData?.lga || 'Abuja Municipal'}</div>
+          </div>
+          
           <button className="w-full bg-[#008753] text-white py-2 px-4 rounded-lg hover:bg-[#006b42] transition font-medium text-sm mb-2">
             Mark Today's Attendance
           </button>

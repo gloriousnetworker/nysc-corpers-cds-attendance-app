@@ -49,7 +49,7 @@ export default function DashboardContent({ activeSection, userData, onUpdateProf
   };
 
   const sectionDescriptions = {
-    overview: 'Welcome to your NYSC CDS Dashboard',
+    overview: 'Kogi State NYSC Dashboard - Confluence State',
     attendance: 'Track and manage your CDS attendance',
     profile: 'View and update your personal information',
     dues: 'Manage your CDS group dues and payments',
@@ -63,11 +63,16 @@ export default function DashboardContent({ activeSection, userData, onUpdateProf
   return (
     <div>
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-800 dark:text-white">
-          {sectionTitles[activeSection] || 'Dashboard'}
-        </h1>
+        <div className="flex items-center gap-2 mb-2">
+          <div className="w-8 h-8 bg-gradient-to-r from-[#008753] to-[#FFA500] rounded-lg flex items-center justify-center text-white font-bold">
+            KOG
+          </div>
+          <h1 className="text-2xl font-bold text-gray-800 dark:text-white">
+            {sectionTitles[activeSection] || 'Dashboard'}
+          </h1>
+        </div>
         <p className={`mt-1 text-sm ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-          {sectionDescriptions[activeSection] || 'Manage your account'}
+          {sectionDescriptions[activeSection] || 'Kogi State Dashboard'}
         </p>
       </div>
       

@@ -1,9 +1,14 @@
+// components/dashboard/kogi-state-dashboard/DashboardNavbar.jsx
 'use client';
 import { useState } from 'react';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '../../../context/AuthContext';
 
-export default function DashboardNavbar({ userData, onLogout, activeSection, setActiveSection, darkMode, toggleDarkMode }) {
+export default function DashboardNavbar({ activeSection, setActiveSection, darkMode, toggleDarkMode, onLogout }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { user } = useAuth();
+  const router = useRouter();
 
   const navSections = [
     { id: 'overview', label: 'Overview', icon: '📊' },
@@ -15,6 +20,10 @@ export default function DashboardNavbar({ userData, onLogout, activeSection, set
     { id: 'reports', label: 'Reports', icon: '📈' },
     { id: 'settings', label: 'Settings', icon: '⚙️' }
   ];
+
+  const handleLogout = () => {
+    onLogout();
+  };
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-white dark:bg-gray-800 shadow-lg border-b border-gray-200 dark:border-gray-700">
@@ -60,7 +69,7 @@ export default function DashboardNavbar({ userData, onLogout, activeSection, set
           <div className="flex items-center space-x-3">
             <div className="hidden sm:flex items-center space-x-2 px-3 py-1 bg-gradient-to-r from-orange-50 to-amber-50 dark:from-orange-900/30 dark:to-amber-900/30 rounded-lg">
               <div className="w-2 h-2 bg-[#FFA500] rounded-full animate-pulse"></div>
-              <span className="text-xs font-medium text-[#FF8C00] dark:text-amber-300">Zone {userData?.cdsZone || '3'}</span>
+              <span className="text-xs font-medium text-[#FF8C00] dark:text-amber-300">Zone {user?.cdsZone || '3'}</span>
             </div>
             
             <button
@@ -73,16 +82,16 @@ export default function DashboardNavbar({ userData, onLogout, activeSection, set
             
             <div className="hidden sm:flex items-center space-x-3">
               <div className="text-right">
-                <div className="font-semibold text-gray-800 dark:text-white text-sm">{userData?.fullName}</div>
-                <div className="text-xs text-gray-600 dark:text-gray-300">{userData?.stateCode}</div>
+                <div className="font-semibold text-gray-800 dark:text-white text-sm">{user?.fullName}</div>
+                <div className="text-xs text-gray-600 dark:text-gray-300">{user?.stateCode}</div>
               </div>
               <div className="w-8 h-8 bg-gradient-to-r from-[#008753] to-[#FFA500] rounded-full flex items-center justify-center text-white font-bold text-sm">
-                {userData?.fullName?.charAt(0) || 'A'}
+                {user?.fullName?.charAt(0) || 'A'}
               </div>
             </div>
             
             <button
-              onClick={onLogout}
+              onClick={handleLogout}
               className="bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 px-3 py-1.5 rounded-lg hover:bg-red-200 dark:hover:bg-red-800/50 transition text-sm font-medium"
             >
               Logout
@@ -103,7 +112,7 @@ export default function DashboardNavbar({ userData, onLogout, activeSection, set
           <div className="md:hidden py-4 border-t border-gray-200 dark:border-gray-700">
             <div className="flex items-center justify-center mb-4">
               <div className="px-3 py-1 bg-gradient-to-r from-orange-50 to-amber-50 dark:from-orange-900/30 dark:to-amber-900/30 rounded-lg">
-                <span className="text-sm font-medium text-[#FF8C00] dark:text-amber-300">Kogi Zone {userData?.cdsZone || '3'}</span>
+                <span className="text-sm font-medium text-[#FF8C00] dark:text-amber-300">Kogi Zone {user?.cdsZone || '3'}</span>
               </div>
             </div>
             <div className="grid grid-cols-3 gap-2 mb-4">
@@ -129,11 +138,11 @@ export default function DashboardNavbar({ userData, onLogout, activeSection, set
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-3">
                   <div className="w-8 h-8 bg-gradient-to-r from-[#008753] to-[#FFA500] rounded-full flex items-center justify-center text-white font-bold">
-                    {userData?.fullName?.charAt(0) || 'A'}
+                    {user?.fullName?.charAt(0) || 'A'}
                   </div>
                   <div>
-                    <div className="font-semibold text-gray-800 dark:text-white text-sm">{userData?.fullName}</div>
-                    <div className="text-xs text-gray-600 dark:text-gray-300">{userData?.stateCode}</div>
+                    <div className="font-semibold text-gray-800 dark:text-white text-sm">{user?.fullName}</div>
+                    <div className="text-xs text-gray-600 dark:text-gray-300">{user?.stateCode}</div>
                   </div>
                 </div>
               </div>

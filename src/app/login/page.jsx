@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { useAuth } from '@/context/AuthContext';
 
 export default function LoginPage() {
   const [formData, setFormData] = useState({
@@ -11,7 +12,11 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [showStateSelection, setShowStateSelection] = useState(false);
+  const [requires2FA, setRequires2FA] = useState(false);
+  const [twoFactorData, setTwoFactorData] = useState(null);
+  const [twoFactorCode, setTwoFactorCode] = useState('');
   const router = useRouter();
+  const { login, loginWith2FA } = useAuth();
 
   const states = [
     { id: 'fct', name: 'FCT', label: 'Federal Capital Territory', route: '/nysc/fct/corpers-dashboard' },
@@ -25,36 +30,83 @@ export default function LoginPage() {
     setError('');
     
     try {
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
-      });
+      const result = await login(formData.identifier, formData.password);
       
-      const data = await response.json();
-      
-      if (response.ok) {
-        localStorage.setItem('nysc_token', data.token);
-        router.push('/corpers-dashboard');
+      if (result.success) {
+        const stateRoutes = {
+          'Kogi': '/nysc/kogi-state/corpers-dashboard',
+          'Lagos': '/nysc/lagos-state/corpers-dashboard',
+          'FCT': '/nysc/fct/corpers-dashboard',
+          'Federal Capital Territory': '/nysc/fct/corpers-dashboard'
+        };
+        
+        const userState = result.data.servingState;
+        const route = stateRoutes[userState] || '/corpers-dashboard';
+        router.push(route);
       } else {
-        setError(data.message || 'Login failed');
+        if (result.message.includes('Two-factor')) {
+          const twoFactorResult = await fetch('https://nysc-backend.vercel.app/api/auth/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(formData)
+          });
+          
+          const twoFactorResponse = await twoFactorResult.json();
+          
+          if (twoFactorResponse.success && twoFactorResponse.data.tempToken) {
+            setTwoFactorData({
+              stateCode: twoFactorResponse.data.stateCode,
+              tempToken: twoFactorResponse.data.tempToken
+            });
+            setRequires2FA(true);
+          } else {
+            setError(result.message || 'Login failed');
+          }
+        } else {
+          setError(result.message || 'Login failed');
+        }
       }
     } catch (err) {
-      localStorage.setItem('nysc_token', 'demo-token-12345');
-      const mockUserData = {
-        firstName: 'Demo',
-        lastName: 'User',
-        fullName: 'Demo User',
-        email: formData.identifier || 'demo@example.com',
-        phone: '08012345678',
-        stateCode: formData.identifier.includes('/NYSC') ? formData.identifier : 'NYSC/2024A/123456',
-        servingState: 'Lagos',
-        localGovernment: 'Ikeja',
-        ppa: 'Ministry of Education',
-        cdsGroup: 'Education'
-      };
-      localStorage.setItem('nysc_user', JSON.stringify(mockUserData));
-      router.push('/corpers-dashboard');
+      setError('Network error. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handle2FASubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError('');
+    
+    try {
+      if (!twoFactorData || !twoFactorCode) {
+        setError('Please enter 2FA code');
+        setLoading(false);
+        return;
+      }
+      
+      const result = await loginWith2FA(
+        twoFactorData.stateCode,
+        twoFactorCode,
+        twoFactorData.tempToken
+      );
+      
+      if (result.success) {
+        const stateRoutes = {
+          'Kogi': '/nysc/kogi-state/corpers-dashboard',
+          'Lagos': '/nysc/lagos-state/corpers-dashboard',
+          'FCT': '/nysc/fct/corpers-dashboard',
+          'Federal Capital Territory': '/nysc/fct/corpers-dashboard'
+        };
+        
+        const userState = result.data.servingState;
+        const route = stateRoutes[userState] || '/corpers-dashboard';
+        router.push(route);
+      } else {
+        setError(result.message || '2FA verification failed');
+      }
+    } catch (err) {
+      setError('Network error. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -72,25 +124,28 @@ export default function LoginPage() {
   };
 
   const handleStateSelect = (stateRoute) => {
-    localStorage.setItem('nysc_token', 'demo-token-12345');
     const mockUserData = {
-      firstName: 'John',
-      lastName: 'Doe',
-      fullName: 'John Doe',
-      email: 'john.doe@example.com',
+      firstName: 'Demo',
+      lastName: 'User',
+      fullName: 'Demo User',
+      email: 'demo@example.com',
       phone: '08012345678',
       stateCode: 'NYSC/2024A/123456',
       servingState: 'Lagos',
       localGovernment: 'Ikeja',
       ppa: 'Ministry of Education',
-      cdsGroup: 'Education'
+      cdsGroup: 'Education',
+      cdsZone: 'Zone 3'
     };
-    localStorage.setItem('nysc_user', JSON.stringify(mockUserData));
+    
     router.push(stateRoute);
   };
 
   const handleBackToMain = () => {
     setShowStateSelection(false);
+    setRequires2FA(false);
+    setTwoFactorData(null);
+    setTwoFactorCode('');
   };
 
   return (
@@ -122,74 +177,122 @@ export default function LoginPage() {
         </div>
         
         {!showStateSelection ? (
-          <form onSubmit={handleSubmit} className="space-y-10">
-            {error && (
-              <div className="bg-red-50 text-red-600 p-5 rounded-lg text-lg">
-                {error}
+          requires2FA ? (
+            <form onSubmit={handle2FASubmit} className="space-y-10">
+              {error && (
+                <div className="bg-red-50 text-red-600 p-5 rounded-lg text-lg">
+                  {error}
+                </div>
+              )}
+              
+              <div className="text-center">
+                <h2 className="text-3xl font-bold text-[#008753] mb-2">Two-Factor Authentication</h2>
+                <p className="text-gray-600 text-xl">Enter the 6-digit code from your authenticator app</p>
+                <p className="text-gray-500 text-lg mt-2">State Code: {twoFactorData?.stateCode}</p>
               </div>
-            )}
-            
-            <div>
-              <label className="block text-2xl font-semibold text-gray-800 mb-4">
-                Email or State Code
-              </label>
-              <input
-                type="text"
-                name="identifier"
-                value={formData.identifier}
-                onChange={handleChange}
-                className="w-full rounded-xl border-2 border-gray-300 px-5 py-5 text-xl focus:outline-none focus:ring-4 focus:ring-[#008753] focus:border-transparent"
-                placeholder="Enter your email or state code"
-                required
-              />
-            </div>
-            
-            <div>
-              <label className="block text-2xl font-semibold text-gray-800 mb-4">
-                Password
-              </label>
-              <input
-                type="password"
-                name="password"
-                value={formData.password}
-                onChange={handleChange}
-                className="w-full rounded-xl border-2 border-gray-300 px-5 py-5 text-xl focus:outline-none focus:ring-4 focus:ring-[#008753] focus:border-transparent"
-                placeholder="Enter your password"
-                required
-              />
-            </div>
-            
-            <div className="text-right">
-              <Link href="/forgot-password" className="text-xl text-[#008753] hover:underline font-medium">
-                Forgot Password?
-              </Link>
-            </div>
-            
-            <button 
-              type="submit" 
-              className="w-full rounded-xl bg-[#008753] text-white font-bold py-5 text-2xl hover:bg-[#006b42] focus:outline-none focus:ring-4 focus:ring-[#008753] transition-all duration-300 transform hover:scale-[1.02] shadow-lg"
-              disabled={loading}
-            >
-              {loading ? 'Logging in...' : 'Login'}
-            </button>
-            
-            <div className="text-center pt-8">
-              <button
-                type="button"
-                onClick={handleDemoLogin}
-                className="w-full bg-gray-100 text-gray-800 font-bold py-5 text-xl rounded-xl hover:bg-gray-200 transition mb-8 shadow-md"
+              
+              <div>
+                <label className="block text-2xl font-semibold text-gray-800 mb-4">
+                  2FA Code
+                </label>
+                <input
+                  type="text"
+                  name="twoFactorCode"
+                  value={twoFactorCode}
+                  onChange={(e) => setTwoFactorCode(e.target.value)}
+                  className="w-full rounded-xl border-2 border-gray-300 px-5 py-5 text-xl focus:outline-none focus:ring-4 focus:ring-[#008753] focus:border-transparent text-center"
+                  placeholder="Enter 6-digit code"
+                  maxLength={6}
+                  required
+                />
+              </div>
+              
+              <button 
+                type="submit" 
+                className="w-full rounded-xl bg-[#008753] text-white font-bold py-5 text-2xl hover:bg-[#006b42] focus:outline-none focus:ring-4 focus:ring-[#008753] transition-all duration-300 transform hover:scale-[1.02] shadow-lg"
+                disabled={loading}
               >
-                Quick Demo Login
+                {loading ? 'Verifying...' : 'Verify 2FA'}
               </button>
               
-              <div className="border-t pt-8">
-                <span className="text-gray-600 text-xl">Don't have an account? </span>
-                <Link href="/signup" className="text-[#008753] font-bold text-xl hover:underline ml-2">
-                  Sign up here
+              <button
+                type="button"
+                onClick={handleBackToMain}
+                className="w-full rounded-xl border-2 border-gray-300 bg-transparent text-gray-800 font-bold py-4 text-xl hover:bg-gray-100 transition shadow-md"
+              >
+                ← Back to Login
+              </button>
+            </form>
+          ) : (
+            <form onSubmit={handleSubmit} className="space-y-10">
+              {error && (
+                <div className="bg-red-50 text-red-600 p-5 rounded-lg text-lg">
+                  {error}
+                </div>
+              )}
+              
+              <div>
+                <label className="block text-2xl font-semibold text-gray-800 mb-4">
+                  Email or State Code
+                </label>
+                <input
+                  type="text"
+                  name="identifier"
+                  value={formData.identifier}
+                  onChange={handleChange}
+                  className="w-full rounded-xl border-2 border-gray-300 px-5 py-5 text-xl focus:outline-none focus:ring-4 focus:ring-[#008753] focus:border-transparent"
+                  placeholder="Enter your email or state code"
+                  required
+                />
+              </div>
+              
+              <div>
+                <label className="block text-2xl font-semibold text-gray-800 mb-4">
+                  Password
+                </label>
+                <input
+                  type="password"
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  className="w-full rounded-xl border-2 border-gray-300 px-5 py-5 text-xl focus:outline-none focus:ring-4 focus:ring-[#008753] focus:border-transparent"
+                  placeholder="Enter your password"
+                  required
+                />
+              </div>
+              
+              <div className="text-right">
+                <Link href="/forgot-password" className="text-xl text-[#008753] hover:underline font-medium">
+                  Forgot Password?
                 </Link>
               </div>
-            </div>
-          </form>
+              
+              <button 
+                type="submit" 
+                className="w-full rounded-xl bg-[#008753] text-white font-bold py-5 text-2xl hover:bg-[#006b42] focus:outline-none focus:ring-4 focus:ring-[#008753] transition-all duration-300 transform hover:scale-[1.02] shadow-lg"
+                disabled={loading}
+              >
+                {loading ? 'Logging in...' : 'Login'}
+              </button>
+              
+              <div className="text-center pt-8">
+                <button
+                  type="button"
+                  onClick={handleDemoLogin}
+                  className="w-full bg-gray-100 text-gray-800 font-bold py-5 text-xl rounded-xl hover:bg-gray-200 transition mb-8 shadow-md"
+                >
+                  Quick Demo Login
+                </button>
+                
+                <div className="border-t pt-8">
+                  <span className="text-gray-600 text-xl">Don't have an account? </span>
+                  <Link href="/signup" className="text-[#008753] font-bold text-xl hover:underline ml-2">
+                    Sign up here
+                  </Link>
+                </div>
+              </div>
+            </form>
+          )
         ) : (
           <div className="space-y-8">
             <div className="text-center mb-8">

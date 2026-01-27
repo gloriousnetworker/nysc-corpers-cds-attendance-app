@@ -2,6 +2,8 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import toast from 'react-hot-toast';
+import { API_BASE_URL } from '@/lib/api';
 
 const nigerianStates = [
   'Abia', 'Adamawa', 'Akwa Ibom', 'Anambra', 'Bauchi', 'Bayelsa', 'Benue', 'Borno',
@@ -30,13 +32,48 @@ export default function SignupPage() {
     ppa: '',
     cdsGroup: '',
     password: '',
-    confirmPassword: '',
-    verificationCode: ''
+    confirmPassword: ''
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [verificationSent, setVerificationSent] = useState(false);
   const router = useRouter();
+
+  const validateStateCode = (code) => {
+    const pattern = /^[A-Z]{2}\/\d{2}[A-Z]\/\d{4}$/;
+    return pattern.test(code);
+  };
+
+  const formatStateCode = (value) => {
+    const cleaned = value.toUpperCase().replace(/[^A-Z0-9\/]/g, '');
+    
+    if (cleaned.length <= 2) return cleaned;
+    
+    if (cleaned.length === 3 && !cleaned.includes('/')) {
+      return cleaned.slice(0, 2) + '/' + cleaned.slice(2);
+    }
+    
+    if (cleaned.length <= 5 && cleaned[2] === '/') {
+      const afterSlash = cleaned.slice(3);
+      if (afterSlash.length <= 2) return cleaned;
+      
+      if (afterSlash.length === 3) {
+        return cleaned.slice(0, 5) + '/' + cleaned.slice(5);
+      }
+    }
+    
+    if (cleaned.length >= 6 && cleaned[2] === '/' && cleaned[5] === '/') {
+      const lastPart = cleaned.slice(6).replace(/\D/g, '').slice(0, 4);
+      return cleaned.slice(0, 6) + lastPart;
+    }
+    
+    if (cleaned.length >= 5 && cleaned[2] === '/' && cleaned[5] !== '/') {
+      const middle = cleaned.slice(3, 6);
+      const lastPart = cleaned.slice(6).replace(/\D/g, '').slice(0, 4);
+      return cleaned.slice(0, 3) + middle + '/' + lastPart;
+    }
+    
+    return cleaned;
+  };
 
   const handleNext = () => {
     setError('');
@@ -46,9 +83,31 @@ export default function SignupPage() {
         setError('Please fill all required fields');
         return;
       }
+      
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(formData.email)) {
+        setError('Please enter a valid email address');
+        return;
+      }
+      
+      const phoneRegex = /^[0-9]{11}$/;
+      if (!phoneRegex.test(formData.phone.replace(/\D/g, ''))) {
+        setError('Please enter a valid 11-digit phone number');
+        return;
+      }
     } else if (step === 2) {
-      if (!formData.stateCode || !formData.servingState || !formData.localGovernment || !formData.ppa || !formData.cdsGroup || !formData.password || !formData.confirmPassword) {
+      if (!formData.stateCode || !formData.servingState || !formData.password || !formData.confirmPassword) {
         setError('Please fill all required fields');
+        return;
+      }
+      
+      if (!validateStateCode(formData.stateCode)) {
+        setError('State Code must be in format: KG/25C/0001');
+        return;
+      }
+      
+      if (formData.password.length < 6) {
+        setError('Password must be at least 6 characters');
         return;
       }
       
@@ -59,13 +118,6 @@ export default function SignupPage() {
     }
     
     setStep(step + 1);
-    
-    if (step === 2 && !verificationSent) {
-      setTimeout(() => {
-        setVerificationSent(true);
-        setFormData(prev => ({...prev, verificationCode: '123456'}));
-      }, 100);
-    }
   };
 
   const handleBack = () => {
@@ -77,28 +129,35 @@ export default function SignupPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    if (step === 3) {
+    if (step === 2) {
       setLoading(true);
       setError('');
       
-      if (!formData.verificationCode) {
-        setError('Please enter verification code');
+      try {
+        const response = await fetch(`${API_BASE_URL}/api/auth/signup`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(formData)
+        });
+
+        const data = await response.json();
+
+        if (response.ok && data.success) {
+          toast.success(data.message || 'Registration successful! Check email for verification code.');
+          localStorage.setItem('pending_verification_email', formData.email);
+          localStorage.setItem('pending_verification_stateCode', formData.stateCode);
+          router.push('/signup/verify');
+        } else {
+          throw new Error(data.message || 'Registration failed');
+        }
+      } catch (err) {
+        toast.error(err.message || 'Registration failed. Please try again.');
+        setError(err.message || 'Registration failed. Please try again.');
+      } finally {
         setLoading(false);
-        return;
       }
-      
-      setTimeout(() => {
-        const userData = {
-          ...formData,
-          fullName: `${formData.firstName} ${formData.lastName}`
-        };
-        
-        localStorage.setItem('nysc_token', 'demo-token-12345');
-        localStorage.setItem('nysc_user', JSON.stringify(userData));
-        
-        setLoading(false);
-        router.push('/login');
-      }, 1500);
       
       return;
     }
@@ -107,18 +166,25 @@ export default function SignupPage() {
   };
 
   const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
-  };
-
-  const handleResendCode = () => {
-    setFormData(prev => ({...prev, verificationCode: ''}));
-    setError('');
-    setTimeout(() => {
-      setFormData(prev => ({...prev, verificationCode: '654321'}));
-    }, 100);
+    const { name, value } = e.target;
+    
+    if (name === 'phone') {
+      const phoneDigits = value.replace(/\D/g, '').slice(0, 11);
+      setFormData({
+        ...formData,
+        [name]: phoneDigits
+      });
+    } else if (name === 'stateCode') {
+      setFormData({
+        ...formData,
+        [name]: formatStateCode(value)
+      });
+    } else {
+      setFormData({
+        ...formData,
+        [name]: value
+      });
+    }
   };
 
   return (
@@ -155,12 +221,12 @@ export default function SignupPage() {
               <div className="h-3 bg-gray-200 rounded-full">
                 <div 
                   className="h-3 bg-[#008753] rounded-full transition-all duration-300"
-                  style={{ width: `${(step / 3) * 100}%` }}
+                  style={{ width: `${(step / 2) * 100}%` }}
                 ></div>
               </div>
             </div>
             <div className="ml-6 text-xl font-semibold text-gray-700">
-              Step {step} of 3
+              Step {step} of 2
             </div>
           </div>
           
@@ -176,12 +242,6 @@ export default function SignupPage() {
                 2
               </div>
               <div className="mt-2 text-lg font-medium">NYSC Details</div>
-            </div>
-            <div className="text-center">
-              <div className={`w-12 h-12 rounded-full flex items-center justify-center text-2xl font-bold ${step >= 3 ? 'bg-[#008753] text-white' : 'bg-gray-200 text-gray-500'}`}>
-                3
-              </div>
-              <div className="mt-2 text-lg font-medium">Verification</div>
             </div>
           </div>
         </div>
@@ -251,9 +311,11 @@ export default function SignupPage() {
                   value={formData.phone}
                   onChange={handleChange}
                   className="w-full rounded-xl border-2 border-gray-300 px-5 py-5 text-xl focus:outline-none focus:ring-4 focus:ring-[#008753] focus:border-transparent"
-                  placeholder="Enter phone number"
+                  placeholder="08012345678"
+                  maxLength="11"
                   required
                 />
+                <p className="text-gray-500 text-lg mt-2">Format: 11 digits (08012345678)</p>
               </div>
             </div>
           )}
@@ -269,10 +331,11 @@ export default function SignupPage() {
                   name="stateCode"
                   value={formData.stateCode}
                   onChange={handleChange}
-                  className="w-full rounded-xl border-2 border-gray-300 px-5 py-5 text-xl focus:outline-none focus:ring-4 focus:ring-[#008753] focus:border-transparent"
-                  placeholder="Enter your state code"
+                  className="w-full rounded-xl border-2 border-gray-300 px-5 py-5 text-xl focus:outline-none focus:ring-4 focus:ring-[#008753] focus:border-transparent uppercase"
+                  placeholder="KG/25C/0001"
                   required
                 />
+                <p className="text-gray-500 text-lg mt-2">Format: KG/25C/0001 (State initials, slash, batch year + stream, slash, 4-digit serial number)</p>
               </div>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
@@ -295,7 +358,7 @@ export default function SignupPage() {
                 </div>
                 <div>
                   <label className="block text-2xl font-semibold text-gray-800 mb-4">
-                    Local Government *
+                    Local Government
                   </label>
                   <input
                     type="text"
@@ -303,15 +366,14 @@ export default function SignupPage() {
                     value={formData.localGovernment}
                     onChange={handleChange}
                     className="w-full rounded-xl border-2 border-gray-300 px-5 py-5 text-xl focus:outline-none focus:ring-4 focus:ring-[#008753] focus:border-transparent"
-                    placeholder="Enter LGA"
-                    required
+                    placeholder="Enter LGA (Optional)"
                   />
                 </div>
               </div>
               
               <div>
                 <label className="block text-2xl font-semibold text-gray-800 mb-4">
-                  Place of Primary Assignment (PPA) *
+                  Place of Primary Assignment (PPA)
                 </label>
                 <input
                   type="text"
@@ -319,23 +381,21 @@ export default function SignupPage() {
                   value={formData.ppa}
                   onChange={handleChange}
                   className="w-full rounded-xl border-2 border-gray-300 px-5 py-5 text-xl focus:outline-none focus:ring-4 focus:ring-[#008753] focus:border-transparent"
-                  placeholder="Enter your PPA"
-                  required
+                  placeholder="Enter your PPA (Optional)"
                 />
               </div>
               
               <div>
                 <label className="block text-2xl font-semibold text-gray-800 mb-4">
-                  CDS Group *
+                  CDS Group
                 </label>
                 <select
                   name="cdsGroup"
                   value={formData.cdsGroup}
                   onChange={handleChange}
                   className="w-full rounded-xl border-2 border-gray-300 px-5 py-5 text-xl focus:outline-none focus:ring-4 focus:ring-[#008753] focus:border-transparent bg-white"
-                  required
                 >
-                  <option value="">Select CDS Group</option>
+                  <option value="">Select CDS Group (Optional)</option>
                   {cdsGroups.map(group => (
                     <option key={group} value={group}>{group}</option>
                   ))}
@@ -354,8 +414,10 @@ export default function SignupPage() {
                     onChange={handleChange}
                     className="w-full rounded-xl border-2 border-gray-300 px-5 py-5 text-xl focus:outline-none focus:ring-4 focus:ring-[#008753] focus:border-transparent"
                     placeholder="Create password"
+                    minLength="6"
                     required
                   />
+                  <p className="text-gray-500 text-lg mt-2">Minimum 6 characters</p>
                 </div>
                 <div>
                   <label className="block text-2xl font-semibold text-gray-800 mb-4">
@@ -368,71 +430,9 @@ export default function SignupPage() {
                     onChange={handleChange}
                     className="w-full rounded-xl border-2 border-gray-300 px-5 py-5 text-xl focus:outline-none focus:ring-4 focus:ring-[#008753] focus:border-transparent"
                     placeholder="Confirm password"
+                    minLength="6"
                     required
                   />
-                </div>
-              </div>
-            </div>
-          )}
-          
-          {step === 3 && (
-            <div className="space-y-10">
-              <div className="bg-blue-50 border-2 border-blue-200 rounded-2xl p-8">
-                <div className="text-center mb-6">
-                  <div className="text-6xl mb-4">📧</div>
-                  <h3 className="text-3xl font-bold text-blue-800 mb-3">Verification Required</h3>
-                  <p className="text-xl text-blue-700">
-                    We've sent a 6-digit code to <span className="font-bold">{formData.email}</span>
-                  </p>
-                  <p className="text-lg text-blue-600 mt-2">Demo code: 123456</p>
-                </div>
-                
-                <div>
-                  <label className="block text-2xl font-semibold text-gray-800 mb-4">
-                    Verification Code *
-                  </label>
-                  <input
-                    type="text"
-                    name="verificationCode"
-                    value={formData.verificationCode}
-                    onChange={handleChange}
-                    className="w-full rounded-xl border-2 border-gray-300 px-5 py-5 text-xl focus:outline-none focus:ring-4 focus:ring-[#008753] focus:border-transparent text-center tracking-widest"
-                    placeholder="Enter 6-digit code"
-                    maxLength="6"
-                    required
-                  />
-                </div>
-                
-                <div className="text-center mt-6">
-                  <button
-                    type="button"
-                    onClick={handleResendCode}
-                    className="text-xl text-[#008753] hover:text-[#006b42] font-medium"
-                  >
-                    Didn't receive code? Resend (New: 654321)
-                  </button>
-                </div>
-              </div>
-              
-              <div className="bg-gray-100 rounded-2xl p-8">
-                <h4 className="text-2xl font-bold text-gray-800 mb-4">Account Summary</h4>
-                <div className="space-y-4">
-                  <div className="flex justify-between">
-                    <span className="text-xl text-gray-600">Name:</span>
-                    <span className="text-xl font-semibold">{formData.firstName} {formData.lastName}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-xl text-gray-600">State Code:</span>
-                    <span className="text-xl font-semibold">{formData.stateCode}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-xl text-gray-600">Serving State:</span>
-                    <span className="text-xl font-semibold">{formData.servingState}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-xl text-gray-600">CDS Group:</span>
-                    <span className="text-xl font-semibold">{formData.cdsGroup}</span>
-                  </div>
                 </div>
               </div>
             </div>
@@ -456,7 +456,7 @@ export default function SignupPage() {
               className="px-10 py-5 text-2xl font-bold bg-[#008753] text-white rounded-xl hover:bg-[#006b42] focus:outline-none focus:ring-4 focus:ring-[#008753] transition-all duration-300 transform hover:scale-[1.02] shadow-lg"
               disabled={loading}
             >
-              {loading ? 'Processing...' : step === 3 ? 'Complete Registration' : 'Next Step →'}
+              {loading ? 'Processing...' : step === 2 ? 'Complete Registration' : 'Next Step →'}
             </button>
           </div>
           

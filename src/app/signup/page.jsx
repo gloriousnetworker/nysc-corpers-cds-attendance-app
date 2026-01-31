@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
@@ -36,7 +36,27 @@ export default function SignupPage() {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [darkMode, setDarkMode] = useState(false);
   const router = useRouter();
+
+  useEffect(() => {
+    const savedTheme = localStorage.getItem('nysc_dark_mode');
+    if (savedTheme === 'true') {
+      setDarkMode(true);
+      document.documentElement.classList.add('dark');
+    }
+  }, []);
+
+  const toggleDarkMode = () => {
+    const newDarkMode = !darkMode;
+    setDarkMode(newDarkMode);
+    localStorage.setItem('nysc_dark_mode', newDarkMode.toString());
+    if (newDarkMode) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  };
 
   const validateStateCode = (code) => {
     const pattern = /^[A-Z]{2}\/\d{2}[A-Z]\/\d{4}$/;
@@ -188,67 +208,77 @@ export default function SignupPage() {
   };
 
   return (
-    <div className="min-h-screen w-full flex flex-col items-center justify-center py-8 px-4 bg-gray-50 font-playfair relative overflow-hidden">
-      <div className="absolute inset-0 z-0 opacity-10">
+    <div className="min-h-screen w-full flex flex-col items-center justify-center py-8 px-4 bg-gray-50 dark:bg-gray-900 font-playfair relative overflow-hidden transition-colors duration-300">
+      <div className="absolute inset-0 z-0 opacity-10 dark:opacity-5">
         <div 
           className="w-full h-full bg-center bg-no-repeat bg-contain"
           style={{ backgroundImage: "url('/images/nysc-logo.png')" }}
         ></div>
       </div>
       
-      <Link 
-        href="/" 
-        className="absolute top-6 left-6 z-20 text-3xl text-[#008753] hover:text-[#006b42] transition"
-      >
-        &lt;
-      </Link>
+      <div className="absolute top-6 left-6 z-20 flex items-center space-x-4">
+        <Link 
+          href="/" 
+          className="text-3xl text-[#008753] dark:text-green-400 hover:text-[#006b42] dark:hover:text-green-300 transition"
+        >
+          &lt;
+        </Link>
+        
+        <button
+          onClick={toggleDarkMode}
+          className="p-2 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition"
+          title={darkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+        >
+          {darkMode ? '☀️' : '🌙'}
+        </button>
+      </div>
       
       {loading && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-20">
-          <div className="h-12 w-12 border-4 border-t-4 border-gray-300 border-t-[#008753] rounded-full animate-spin"></div>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-20 dark:bg-opacity-40">
+          <div className="h-12 w-12 border-4 border-t-4 border-gray-300 dark:border-gray-600 border-t-[#008753] dark:border-t-green-400 rounded-full animate-spin"></div>
         </div>
       )}
       
       <div className="relative z-10 w-full max-w-4xl">
         <div className="mb-10 text-center">
-          <h1 className="text-5xl font-bold text-[#008753] mb-4">CDS Attendance Portal</h1>
-          <p className="text-gray-600 text-2xl">Register to start tracking your attendance</p>
+          <h1 className="text-5xl font-bold text-[#008753] dark:text-green-400 mb-4">CDS Attendance Portal</h1>
+          <p className="text-gray-600 dark:text-gray-300 text-2xl">Register to start tracking your attendance</p>
         </div>
         
         <div className="mb-12">
           <div className="flex items-center justify-between mb-8">
             <div className="flex-1">
-              <div className="h-3 bg-gray-200 rounded-full">
+              <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded-full">
                 <div 
-                  className="h-3 bg-[#008753] rounded-full transition-all duration-300"
+                  className="h-3 bg-[#008753] dark:bg-green-500 rounded-full transition-all duration-300"
                   style={{ width: `${(step / 2) * 100}%` }}
                 ></div>
               </div>
             </div>
-            <div className="ml-6 text-xl font-semibold text-gray-700">
+            <div className="ml-6 text-xl font-semibold text-gray-700 dark:text-gray-300">
               Step {step} of 2
             </div>
           </div>
           
           <div className="flex justify-between">
             <div className="text-center">
-              <div className={`w-12 h-12 rounded-full flex items-center justify-center text-2xl font-bold ${step >= 1 ? 'bg-[#008753] text-white' : 'bg-gray-200 text-gray-500'}`}>
+              <div className={`w-12 h-12 rounded-full flex items-center justify-center text-2xl font-bold ${step >= 1 ? 'bg-[#008753] dark:bg-green-500 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400'}`}>
                 1
               </div>
-              <div className="mt-2 text-lg font-medium">Basic Info</div>
+              <div className="mt-2 text-lg font-medium text-gray-800 dark:text-gray-300">Basic Info</div>
             </div>
             <div className="text-center">
-              <div className={`w-12 h-12 rounded-full flex items-center justify-center text-2xl font-bold ${step >= 2 ? 'bg-[#008753] text-white' : 'bg-gray-200 text-gray-500'}`}>
+              <div className={`w-12 h-12 rounded-full flex items-center justify-center text-2xl font-bold ${step >= 2 ? 'bg-[#008753] dark:bg-green-500 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400'}`}>
                 2
               </div>
-              <div className="mt-2 text-lg font-medium">NYSC Details</div>
+              <div className="mt-2 text-lg font-medium text-gray-800 dark:text-gray-300">NYSC Details</div>
             </div>
           </div>
         </div>
         
         <form onSubmit={handleSubmit} className="space-y-10">
           {error && (
-            <div className="bg-red-50 text-red-600 p-5 rounded-xl text-lg">
+            <div className="bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 p-5 rounded-xl text-lg">
               {error}
             </div>
           )}
@@ -257,7 +287,7 @@ export default function SignupPage() {
             <div className="space-y-10">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
                 <div>
-                  <label className="block text-2xl font-semibold text-gray-800 mb-4">
+                  <label className="block text-2xl font-semibold text-gray-800 dark:text-gray-200 mb-4">
                     First Name *
                   </label>
                   <input
@@ -265,13 +295,13 @@ export default function SignupPage() {
                     name="firstName"
                     value={formData.firstName}
                     onChange={handleChange}
-                    className="w-full rounded-xl border-2 border-gray-300 px-5 py-5 text-xl focus:outline-none focus:ring-4 focus:ring-[#008753] focus:border-transparent"
+                    className="w-full rounded-xl border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 px-5 py-5 text-xl focus:outline-none focus:ring-4 focus:ring-[#008753] dark:focus:ring-green-500 focus:border-transparent transition-colors"
                     placeholder="Enter first name"
                     required
                   />
                 </div>
                 <div>
-                  <label className="block text-2xl font-semibold text-gray-800 mb-4">
+                  <label className="block text-2xl font-semibold text-gray-800 dark:text-gray-200 mb-4">
                     Last Name *
                   </label>
                   <input
@@ -279,7 +309,7 @@ export default function SignupPage() {
                     name="lastName"
                     value={formData.lastName}
                     onChange={handleChange}
-                    className="w-full rounded-xl border-2 border-gray-300 px-5 py-5 text-xl focus:outline-none focus:ring-4 focus:ring-[#008753] focus:border-transparent"
+                    className="w-full rounded-xl border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 px-5 py-5 text-xl focus:outline-none focus:ring-4 focus:ring-[#008753] dark:focus:ring-green-500 focus:border-transparent transition-colors"
                     placeholder="Enter last name"
                     required
                   />
@@ -287,7 +317,7 @@ export default function SignupPage() {
               </div>
               
               <div>
-                <label className="block text-2xl font-semibold text-gray-800 mb-4">
+                <label className="block text-2xl font-semibold text-gray-800 dark:text-gray-200 mb-4">
                   Email Address *
                 </label>
                 <input
@@ -295,14 +325,14 @@ export default function SignupPage() {
                   name="email"
                   value={formData.email}
                   onChange={handleChange}
-                  className="w-full rounded-xl border-2 border-gray-300 px-5 py-5 text-xl focus:outline-none focus:ring-4 focus:ring-[#008753] focus:border-transparent"
+                  className="w-full rounded-xl border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 px-5 py-5 text-xl focus:outline-none focus:ring-4 focus:ring-[#008753] dark:focus:ring-green-500 focus:border-transparent transition-colors"
                   placeholder="Enter email address"
                   required
                 />
               </div>
               
               <div>
-                <label className="block text-2xl font-semibold text-gray-800 mb-4">
+                <label className="block text-2xl font-semibold text-gray-800 dark:text-gray-200 mb-4">
                   Phone Number *
                 </label>
                 <input
@@ -310,12 +340,12 @@ export default function SignupPage() {
                   name="phone"
                   value={formData.phone}
                   onChange={handleChange}
-                  className="w-full rounded-xl border-2 border-gray-300 px-5 py-5 text-xl focus:outline-none focus:ring-4 focus:ring-[#008753] focus:border-transparent"
+                  className="w-full rounded-xl border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 px-5 py-5 text-xl focus:outline-none focus:ring-4 focus:ring-[#008753] dark:focus:ring-green-500 focus:border-transparent transition-colors"
                   placeholder="08012345678"
                   maxLength="11"
                   required
                 />
-                <p className="text-gray-500 text-lg mt-2">Format: 11 digits (08012345678)</p>
+                <p className="text-gray-500 dark:text-gray-400 text-lg mt-2">Format: 11 digits (08012345678)</p>
               </div>
             </div>
           )}
@@ -323,7 +353,7 @@ export default function SignupPage() {
           {step === 2 && (
             <div className="space-y-10">
               <div>
-                <label className="block text-2xl font-semibold text-gray-800 mb-4">
+                <label className="block text-2xl font-semibold text-gray-800 dark:text-gray-200 mb-4">
                   State Code *
                 </label>
                 <input
@@ -331,23 +361,23 @@ export default function SignupPage() {
                   name="stateCode"
                   value={formData.stateCode}
                   onChange={handleChange}
-                  className="w-full rounded-xl border-2 border-gray-300 px-5 py-5 text-xl focus:outline-none focus:ring-4 focus:ring-[#008753] focus:border-transparent uppercase"
+                  className="w-full rounded-xl border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 px-5 py-5 text-xl focus:outline-none focus:ring-4 focus:ring-[#008753] dark:focus:ring-green-500 focus:border-transparent uppercase transition-colors"
                   placeholder="KG/25C/0001"
                   required
                 />
-                <p className="text-gray-500 text-lg mt-2">Format: KG/25C/0001 (State initials, slash, batch year + stream, slash, 4-digit serial number)</p>
+                <p className="text-gray-500 dark:text-gray-400 text-lg mt-2">Format: KG/25C/0001 (State initials, slash, batch year + stream, slash, 4-digit serial number)</p>
               </div>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
                 <div>
-                  <label className="block text-2xl font-semibold text-gray-800 mb-4">
+                  <label className="block text-2xl font-semibold text-gray-800 dark:text-gray-200 mb-4">
                     Serving State *
                   </label>
                   <select
                     name="servingState"
                     value={formData.servingState}
                     onChange={handleChange}
-                    className="w-full rounded-xl border-2 border-gray-300 px-5 py-5 text-xl focus:outline-none focus:ring-4 focus:ring-[#008753] focus:border-transparent bg-white"
+                    className="w-full rounded-xl border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 px-5 py-5 text-xl focus:outline-none focus:ring-4 focus:ring-[#008753] dark:focus:ring-green-500 focus:border-transparent transition-colors"
                     required
                   >
                     <option value="">Select State</option>
@@ -357,7 +387,7 @@ export default function SignupPage() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-2xl font-semibold text-gray-800 mb-4">
+                  <label className="block text-2xl font-semibold text-gray-800 dark:text-gray-200 mb-4">
                     Local Government
                   </label>
                   <input
@@ -365,14 +395,14 @@ export default function SignupPage() {
                     name="localGovernment"
                     value={formData.localGovernment}
                     onChange={handleChange}
-                    className="w-full rounded-xl border-2 border-gray-300 px-5 py-5 text-xl focus:outline-none focus:ring-4 focus:ring-[#008753] focus:border-transparent"
+                    className="w-full rounded-xl border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 px-5 py-5 text-xl focus:outline-none focus:ring-4 focus:ring-[#008753] dark:focus:ring-green-500 focus:border-transparent transition-colors"
                     placeholder="Enter LGA (Optional)"
                   />
                 </div>
               </div>
               
               <div>
-                <label className="block text-2xl font-semibold text-gray-800 mb-4">
+                <label className="block text-2xl font-semibold text-gray-800 dark:text-gray-200 mb-4">
                   Place of Primary Assignment (PPA)
                 </label>
                 <input
@@ -380,20 +410,20 @@ export default function SignupPage() {
                   name="ppa"
                   value={formData.ppa}
                   onChange={handleChange}
-                  className="w-full rounded-xl border-2 border-gray-300 px-5 py-5 text-xl focus:outline-none focus:ring-4 focus:ring-[#008753] focus:border-transparent"
+                  className="w-full rounded-xl border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 px-5 py-5 text-xl focus:outline-none focus:ring-4 focus:ring-[#008753] dark:focus:ring-green-500 focus:border-transparent transition-colors"
                   placeholder="Enter your PPA (Optional)"
                 />
               </div>
               
               <div>
-                <label className="block text-2xl font-semibold text-gray-800 mb-4">
+                <label className="block text-2xl font-semibold text-gray-800 dark:text-gray-200 mb-4">
                   CDS Group
                 </label>
                 <select
                   name="cdsGroup"
                   value={formData.cdsGroup}
                   onChange={handleChange}
-                  className="w-full rounded-xl border-2 border-gray-300 px-5 py-5 text-xl focus:outline-none focus:ring-4 focus:ring-[#008753] focus:border-transparent bg-white"
+                  className="w-full rounded-xl border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 px-5 py-5 text-xl focus:outline-none focus:ring-4 focus:ring-[#008753] dark:focus:ring-green-500 focus:border-transparent transition-colors"
                 >
                   <option value="">Select CDS Group (Optional)</option>
                   {cdsGroups.map(group => (
@@ -404,7 +434,7 @@ export default function SignupPage() {
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
                 <div>
-                  <label className="block text-2xl font-semibold text-gray-800 mb-4">
+                  <label className="block text-2xl font-semibold text-gray-800 dark:text-gray-200 mb-4">
                     Password *
                   </label>
                   <input
@@ -412,15 +442,15 @@ export default function SignupPage() {
                     name="password"
                     value={formData.password}
                     onChange={handleChange}
-                    className="w-full rounded-xl border-2 border-gray-300 px-5 py-5 text-xl focus:outline-none focus:ring-4 focus:ring-[#008753] focus:border-transparent"
+                    className="w-full rounded-xl border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 px-5 py-5 text-xl focus:outline-none focus:ring-4 focus:ring-[#008753] dark:focus:ring-green-500 focus:border-transparent transition-colors"
                     placeholder="Create password"
                     minLength="6"
                     required
                   />
-                  <p className="text-gray-500 text-lg mt-2">Minimum 6 characters</p>
+                  <p className="text-gray-500 dark:text-gray-400 text-lg mt-2">Minimum 6 characters</p>
                 </div>
                 <div>
-                  <label className="block text-2xl font-semibold text-gray-800 mb-4">
+                  <label className="block text-2xl font-semibold text-gray-800 dark:text-gray-200 mb-4">
                     Confirm Password *
                   </label>
                   <input
@@ -428,7 +458,7 @@ export default function SignupPage() {
                     name="confirmPassword"
                     value={formData.confirmPassword}
                     onChange={handleChange}
-                    className="w-full rounded-xl border-2 border-gray-300 px-5 py-5 text-xl focus:outline-none focus:ring-4 focus:ring-[#008753] focus:border-transparent"
+                    className="w-full rounded-xl border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 px-5 py-5 text-xl focus:outline-none focus:ring-4 focus:ring-[#008753] dark:focus:ring-green-500 focus:border-transparent transition-colors"
                     placeholder="Confirm password"
                     minLength="6"
                     required
@@ -443,7 +473,7 @@ export default function SignupPage() {
               <button
                 type="button"
                 onClick={handleBack}
-                className="px-10 py-5 text-2xl font-bold border-2 border-[#008753] text-[#008753] rounded-xl hover:bg-[#008753] hover:text-white transition-all duration-300"
+                className="px-10 py-5 text-2xl font-bold border-2 border-[#008753] dark:border-green-500 text-[#008753] dark:text-green-400 rounded-xl hover:bg-[#008753] dark:hover:bg-green-500 hover:text-white dark:hover:text-white transition-all duration-300"
               >
                 ← Back
               </button>
@@ -453,16 +483,16 @@ export default function SignupPage() {
             
             <button 
               type="submit" 
-              className="px-10 py-5 text-2xl font-bold bg-[#008753] text-white rounded-xl hover:bg-[#006b42] focus:outline-none focus:ring-4 focus:ring-[#008753] transition-all duration-300 transform hover:scale-[1.02] shadow-lg"
+              className="px-10 py-5 text-2xl font-bold bg-gradient-to-r from-[#008753] to-[#FFA500] dark:from-green-600 dark:to-amber-600 text-white rounded-xl hover:opacity-90 focus:outline-none focus:ring-4 focus:ring-[#008753] dark:focus:ring-green-500 transition-all duration-300 transform hover:scale-[1.02] shadow-lg"
               disabled={loading}
             >
               {loading ? 'Processing...' : step === 2 ? 'Complete Registration' : 'Next Step →'}
             </button>
           </div>
           
-          <div className="text-center pt-10 border-t">
-            <span className="text-gray-600 text-xl">Already have an account? </span>
-            <Link href="/login" className="text-[#008753] font-bold text-xl hover:underline ml-2">
+          <div className="text-center pt-10 border-t border-gray-300 dark:border-gray-700">
+            <span className="text-gray-600 dark:text-gray-300 text-xl">Already have an account? </span>
+            <Link href="/login" className="text-[#008753] dark:text-green-400 font-bold text-xl hover:underline ml-2">
               Login here
             </Link>
           </div>

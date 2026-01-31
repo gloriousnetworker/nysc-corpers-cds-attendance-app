@@ -1,6 +1,7 @@
 'use client';
 import { createContext, useContext, useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { API_BASE_URL, API_ENDPOINTS } from '@/lib/api';
 
 const AuthContext = createContext();
 
@@ -14,31 +15,88 @@ export function AuthProvider({ children }) {
     checkAuth();
   }, []);
 
+  const getAuthCookie = () => {
+    if (typeof window === 'undefined') return null;
+    const cookies = document.cookie.split(';');
+    for (let cookie of cookies) {
+      const [name, value] = cookie.trim().split('=');
+      if (name === 'nysc_token') return value;
+    }
+    return null;
+  };
+
+  const setAuthCookie = (token) => {
+    if (typeof window === 'undefined') return;
+    
+    const domain = window.location.hostname.includes('localhost') 
+      ? 'localhost' 
+      : window.location.hostname.includes('vercel.app')
+      ? '.vercel.app'
+      : window.location.hostname;
+    
+    const expires = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toUTCString();
+    
+    document.cookie = `nysc_token=${token}; Path=/; Domain=${domain}; SameSite=Lax; Expires=${expires}${process.env.NODE_ENV === 'production' ? '; Secure' : ''}`;
+  };
+
   const checkAuth = async () => {
     try {
-      const response = await fetch('https://nysc-backend.vercel.app/api/auth/me', {
+      const authCookie = getAuthCookie();
+      const storedUser = localStorage.getItem('nysc_user');
+      
+      if (!authCookie) {
+        if (storedUser) {
+          try {
+            const parsedUser = JSON.parse(storedUser);
+            setUser(parsedUser);
+          } catch {
+            clearAuth();
+          }
+        }
+        setLoading(false);
+        setAuthChecked(true);
+        return;
+      }
+
+      const response = await fetch(API_ENDPOINTS.ME, {
         method: 'GET',
         credentials: 'include',
-        mode: 'cors',
         headers: {
           'Accept': 'application/json',
           'Content-Type': 'application/json'
         }
       });
 
-      if (response.ok) {
-        const data = await response.json();
-        if (data.success && data.data && data.data.corper) {
-          setUser(data.data.corper);
+      const data = await response.json();
+      
+      if (response.ok && data.success && data.data && data.data.corper) {
+        setUser(data.data.corper);
+        localStorage.setItem('nysc_user', JSON.stringify(data.data.corper));
+      } else {
+        if (storedUser) {
+          try {
+            const parsedUser = JSON.parse(storedUser);
+            setUser(parsedUser);
+          } catch {
+            clearAuth();
+          }
         } else {
+          clearAuth();
+        }
+      }
+    } catch (error) {
+      console.error('Auth check error:', error);
+      const storedUser = localStorage.getItem('nysc_user');
+      if (storedUser) {
+        try {
+          const parsedUser = JSON.parse(storedUser);
+          setUser(parsedUser);
+        } catch {
           clearAuth();
         }
       } else {
         clearAuth();
       }
-    } catch (error) {
-      console.error('Auth check error:', error);
-      clearAuth();
     } finally {
       setLoading(false);
       setAuthChecked(true);
@@ -47,14 +105,13 @@ export function AuthProvider({ children }) {
 
   const login = async (identifier, password) => {
     try {
-      const response = await fetch('https://nysc-backend.vercel.app/api/auth/login', {
+      const response = await fetch(API_ENDPOINTS.LOGIN, {
         method: 'POST',
+        credentials: 'include',
         headers: { 
           'Content-Type': 'application/json',
           'Accept': 'application/json'
         },
-        credentials: 'include',
-        mode: 'cors',
         body: JSON.stringify({ identifier, password }),
       });
 
@@ -63,14 +120,13 @@ export function AuthProvider({ children }) {
       if (response.ok && data.success) {
         const userData = data.data.corper || data.data;
         setUser(userData);
-        
-        await new Promise(resolve => setTimeout(resolve, 100));
+        localStorage.setItem('nysc_user', JSON.stringify(userData));
         
         await checkAuth();
         
         return { success: true, data: userData };
       } else {
-        return { success: false, message: data.message };
+        return { success: false, message: data.message || 'Login failed' };
       }
     } catch (error) {
       console.error('Login error:', error);
@@ -80,14 +136,13 @@ export function AuthProvider({ children }) {
 
   const loginWith2FA = async (stateCode, twoFactorCode, tempToken) => {
     try {
-      const response = await fetch('https://nysc-backend.vercel.app/api/auth/verify-2fa', {
+      const response = await fetch(API_ENDPOINTS.VERIFY_2FA, {
         method: 'POST',
+        credentials: 'include',
         headers: { 
           'Content-Type': 'application/json',
           'Accept': 'application/json'
         },
-        credentials: 'include',
-        mode: 'cors',
         body: JSON.stringify({ 
           stateCode, 
           twoFactorCode, 
@@ -100,8 +155,7 @@ export function AuthProvider({ children }) {
       if (response.ok && data.success) {
         const userData = data.data.corper;
         setUser(userData);
-        
-        await new Promise(resolve => setTimeout(resolve, 100));
+        localStorage.setItem('nysc_user', JSON.stringify(userData));
         
         await checkAuth();
         
@@ -117,10 +171,9 @@ export function AuthProvider({ children }) {
 
   const logout = async () => {
     try {
-      await fetch('https://nysc-backend.vercel.app/api/auth/logout', {
+      await fetch(API_ENDPOINTS.LOGOUT, {
         method: 'POST',
         credentials: 'include',
-        mode: 'cors',
         headers: {
           'Accept': 'application/json',
           'Content-Type': 'application/json'
@@ -136,26 +189,32 @@ export function AuthProvider({ children }) {
 
   const clearAuth = () => {
     setUser(null);
+    localStorage.removeItem('nysc_user');
+    localStorage.removeItem('pending_verification_email');
+    localStorage.removeItem('pending_verification_stateCode');
+    localStorage.removeItem('tempToken');
+    localStorage.removeItem('stateCode');
     
-    const cookies = document.cookie.split(';');
-    for (let i = 0; i < cookies.length; i++) {
-      const cookie = cookies[i];
-      const eqPos = cookie.indexOf('=');
-      const name = eqPos > -1 ? cookie.substr(0, eqPos).trim() : cookie.trim();
-      document.cookie = name + '=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;domain=.vercel.app';
-      document.cookie = name + '=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;';
+    if (typeof window !== 'undefined') {
+      const domain = window.location.hostname.includes('localhost') 
+        ? 'localhost' 
+        : window.location.hostname.includes('vercel.app')
+        ? '.vercel.app'
+        : window.location.hostname;
+      
+      document.cookie = `nysc_token=; Path=/; Domain=${domain}; Expires=Thu, 01 Jan 1970 00:00:00 GMT`;
     }
   };
 
   const updateUser = (updatedData) => {
     const mergedData = { ...user, ...updatedData };
     setUser(mergedData);
+    localStorage.setItem('nysc_user', JSON.stringify(mergedData));
   };
 
   const fetchWithAuth = async (url, options = {}) => {
     const defaultOptions = {
       credentials: 'include',
-      mode: 'cors',
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
@@ -164,7 +223,7 @@ export function AuthProvider({ children }) {
     };
 
     try {
-      const response = await fetch(`https://nysc-backend.vercel.app${url}`, {
+      const response = await fetch(`${API_BASE_URL}${url}`, {
         ...defaultOptions,
         ...options,
         headers: {
@@ -195,6 +254,7 @@ export function AuthProvider({ children }) {
       
       if (data.success && data.data.corper) {
         setUser(data.data.corper);
+        localStorage.setItem('nysc_user', JSON.stringify(data.data.corper));
         return data.data.corper;
       }
       return null;

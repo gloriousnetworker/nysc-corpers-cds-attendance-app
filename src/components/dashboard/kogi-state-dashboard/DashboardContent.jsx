@@ -7,7 +7,7 @@ import DuesSection from './sections/DuesSection';
 import ScheduleSection from './sections/ScheduleSection';
 import MarketplaceSection from './sections/MarketplaceSection';
 import ReportsSection from './sections/ReportsSection';
-import SettingsSection from './sections/SettingsSection';
+import SettingsSection from './sections/settings/SettingsSection';
 import HelpSection from './sections/HelpSection';
 
 export default function DashboardContent({ activeSection, userData, onUpdateProfile, darkMode, toggleDarkMode }) {

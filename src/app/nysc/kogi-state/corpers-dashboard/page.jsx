@@ -1,7 +1,5 @@
-// app/nysc/kogi-state/corpers-dashboard/page.jsx
 'use client';
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 import DashboardNavbar from '../../../../components/dashboard/kogi-state-dashboard/DashboardNavbar';
 import DashboardSidebar from '../../../../components/dashboard/kogi-state-dashboard/DashboardSidebar';
 import DashboardContent from '../../../../components/dashboard/kogi-state-dashboard/DashboardContent';
@@ -11,7 +9,6 @@ import { useAuth } from '../../../../context/AuthContext';
 export default function KogiCorpersDashboard() {
   const [activeSection, setActiveSection] = useState('overview');
   const [darkMode, setDarkMode] = useState(false);
-  const router = useRouter();
   const { user, logout, updateUser } = useAuth();
 
   useEffect(() => {
@@ -45,21 +42,10 @@ export default function KogiCorpersDashboard() {
     updateUser(updatedData);
   };
 
-  if (!user) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-white dark:bg-gray-900">
-        <div className="text-center">
-          <div className="h-12 w-12 border-4 border-t-4 border-gray-300 border-t-[#FFA500] rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600 dark:text-gray-300">Loading Kogi Dashboard...</p>
-        </div>
-      </div>
-    );
-  }
-
   const userWithKogiData = {
     ...user,
-    lga: user.localGovernment || 'Lokoja',
-    cdsZone: user.cdsZone || 'Zone 3',
+    lga: user?.localGovernment || 'Lokoja',
+    cdsZone: user?.cdsZone || 'Zone 3',
     cdsLocation: 'Lokoja Secretariat',
     batch: 'Batch B',
     stream: 'Stream II',

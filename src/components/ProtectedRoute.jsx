@@ -8,13 +8,13 @@ export default function ProtectedRoute({ children, requiredState = null }) {
   const router = useRouter();
   
   useEffect(() => {
-    if (!loading && authChecked && !isAuthenticated) {
-      router.push('/login');
-      return;
-    }
-    
-    if (!loading && authChecked && isAuthenticated && requiredState) {
-      if (user?.servingState !== requiredState) {
+    if (authChecked && !loading) {
+      if (!isAuthenticated) {
+        router.push('/login');
+        return;
+      }
+      
+      if (requiredState && user?.servingState !== requiredState) {
         const stateRoutes = {
           'Kogi': '/nysc/kogi-state/corpers-dashboard',
           'Lagos': '/nysc/lagos-state/corpers-dashboard',
@@ -23,9 +23,7 @@ export default function ProtectedRoute({ children, requiredState = null }) {
         };
         
         const redirectRoute = stateRoutes[user?.servingState] || '/login';
-        if (redirectRoute !== window.location.pathname) {
-          router.push(redirectRoute);
-        }
+        router.push(redirectRoute);
       }
     }
   }, [loading, authChecked, isAuthenticated, user, requiredState, router]);
@@ -35,7 +33,7 @@ export default function ProtectedRoute({ children, requiredState = null }) {
       <div className="min-h-screen flex items-center justify-center bg-white dark:bg-gray-900">
         <div className="text-center">
           <div className="h-12 w-12 border-4 border-t-4 border-gray-300 border-t-[#008753] rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600 dark:text-gray-300">Loading...</p>
+          <p className="text-gray-600 dark:text-gray-300">Loading Dashboard...</p>
         </div>
       </div>
     );

@@ -16,7 +16,7 @@ export default function LoginPage() {
   const [showStateSelection, setShowStateSelection] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
   const router = useRouter();
-  const { login, demoLogin } = useAuth();
+  const { login } = useAuth();
 
   useEffect(() => {
     const savedTheme = localStorage.getItem('nysc_dark_mode');
@@ -54,7 +54,7 @@ export default function LoginPage() {
       }
       
       if (data.success && data.data?.status === 'pending') {
-        router.push('/login/continue-registration');
+        router.push(`/login/continue-registration?email=${encodeURIComponent(email)}`);
         return 'pending';
       }
       
@@ -133,22 +133,8 @@ export default function LoginPage() {
     setShowStateSelection(true);
   };
 
-  const handleStateSelect = async (stateRoute) => {
-    setLoading(true);
-    try {
-      const result = await demoLogin(stateRoute);
-      if (result.success) {
-        toast.success('Demo login successful!');
-      } else {
-        toast.error(result.message || 'Demo login failed');
-        setShowStateSelection(false);
-      }
-    } catch (err) {
-      toast.error('Demo login failed. Please try again.');
-      setShowStateSelection(false);
-    } finally {
-      setLoading(false);
-    }
+  const handleStateSelect = (stateRoute) => {
+    router.push(stateRoute);
   };
 
   const handleBackToMain = () => {

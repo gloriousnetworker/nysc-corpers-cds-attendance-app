@@ -4,9 +4,7 @@ import { API_ENDPOINTS } from '@/lib/api';
 import { useAuth } from '@/context/AuthContext';
 import toast from 'react-hot-toast';
 
-export default function SecuritySettings({ darkMode }) {
-  const { user, logout, fetchWithAuth } = useAuth();
-  
+export default function SecuritySettings({ darkMode, userData }) {
   const [settings, setSettings] = useState({
     security: {
       twoFactor: false,
@@ -50,36 +48,21 @@ export default function SecuritySettings({ darkMode }) {
   const resetCodeRefs = useRef([]);
   const disable2FARefs = useRef([]);
 
+  const { logout, getCurrentUser } = useAuth();
+
   useEffect(() => {
-    if (user) {
+    if (userData) {
       setSettings(prev => ({
         ...prev,
         security: {
           ...prev.security,
-          twoFactor: user.twoFactorEnabled || false
+          twoFactor: userData.twoFactorEnabled || false
         }
       }));
     }
-  }, [user]);
+  }, [userData]);
 
-  const saveSettings = async (newSettings) => {
-    setSettings(newSettings);
-    try {
-      const response = await fetchWithAuth(API_ENDPOINTS.UPDATE_SETTINGS, {
-        method: 'POST',
-        body: JSON.stringify(newSettings)
-      });
-      
-      if (!response.ok) {
-        throw new Error('Failed to save settings');
-      }
-    } catch (error) {
-      console.error('Error saving settings:', error);
-      toast.error('Failed to save settings');
-    }
-  };
-
-  const handleToggle = async (key) => {
+  const handleToggle = (key) => {
     if (key === 'twoFactor' && !settings.security.twoFactor) {
       initiate2FASetup();
       return;
@@ -92,15 +75,19 @@ export default function SecuritySettings({ darkMode }) {
         [key]: !settings.security[key]
       }
     };
-    await saveSettings(updatedSettings);
+    setSettings(updatedSettings);
   };
 
   const initiate2FASetup = async () => {
     setTwoFactorSetup({ ...twoFactorSetup, loading: true });
     
     try {
-      const response = await fetchWithAuth(API_ENDPOINTS.SETUP_2FA, {
-        method: 'POST'
+      const response = await fetch(API_ENDPOINTS.SETUP_2FA, {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json'
+        }
       });
 
       const data = await response.json();
@@ -134,9 +121,14 @@ export default function SecuritySettings({ darkMode }) {
     setTwoFactorSetup({ ...twoFactorSetup, verifying: true });
     
     try {
-      const response = await fetchWithAuth(API_ENDPOINTS.VERIFY_2FA_SETUP, {
+      const response = await fetch(API_ENDPOINTS.VERIFY_2FA_SETUP, {
         method: 'POST',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json'
+        },
         body: JSON.stringify({
+          stateCode: userData?.stateCode,
           twoFactorCode: code
         })
       });
@@ -151,7 +143,7 @@ export default function SecuritySettings({ darkMode }) {
             twoFactor: true
           }
         };
-        await saveSettings(updatedSettings);
+        setSettings(updatedSettings);
         
         setTwoFactorSetup({
           loading: false,
@@ -163,6 +155,8 @@ export default function SecuritySettings({ darkMode }) {
           verifying: false,
           secretCopied: false
         });
+        
+        await getCurrentUser();
         
         toast.success('Two-factor authentication enabled successfully!');
       } else {
@@ -184,8 +178,12 @@ export default function SecuritySettings({ darkMode }) {
     setDisable2FA({ ...disable2FA, loading: true });
     
     try {
-      const response = await fetchWithAuth(API_ENDPOINTS.DISABLE_2FA, {
+      const response = await fetch(API_ENDPOINTS.DISABLE_2FA, {
         method: 'POST',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json'
+        },
         body: JSON.stringify({
           twoFactorCode: code
         })
@@ -201,13 +199,15 @@ export default function SecuritySettings({ darkMode }) {
             twoFactor: false
           }
         };
-        await saveSettings(updatedSettings);
+        setSettings(updatedSettings);
         
         setDisable2FA({
           show: false,
           code: '',
           loading: false
         });
+        
+        await getCurrentUser();
         
         toast.success('Two-factor authentication disabled successfully!');
       } else {
@@ -223,8 +223,12 @@ export default function SecuritySettings({ darkMode }) {
     setBackupCodes({ ...backupCodes, loading: true });
     
     try {
-      const response = await fetchWithAuth(API_ENDPOINTS.GENERATE_BACKUP_CODES, {
-        method: 'POST'
+      const response = await fetch(API_ENDPOINTS.GENERATE_BACKUP_CODES, {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json'
+        }
       });
 
       const data = await response.json();
@@ -246,7 +250,7 @@ export default function SecuritySettings({ darkMode }) {
   };
 
   const sendPasswordResetCode = async () => {
-    if (!user?.email) {
+    if (!userData?.email) {
       toast.error('No email address found');
       return;
     }
@@ -260,7 +264,7 @@ export default function SecuritySettings({ darkMode }) {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          email: user.email
+          email: userData.email
         })
       });
 
@@ -309,7 +313,7 @@ export default function SecuritySettings({ darkMode }) {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          email: user.email,
+          email: userData.email,
           resetCode: code,
           newPassword: passwordReset.newPassword,
           confirmPassword: passwordReset.confirmPassword
@@ -351,7 +355,7 @@ export default function SecuritySettings({ darkMode }) {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `nysc_2fa_backup_codes_${user?.stateCode}.txt`;
+    a.download = `nysc_2fa_backup_codes_${userData?.stateCode}.txt`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -638,7 +642,7 @@ export default function SecuritySettings({ darkMode }) {
               const url = URL.createObjectURL(blob);
               const a = document.createElement('a');
               a.href = url;
-              a.download = `nysc_new_backup_codes_${user?.stateCode}.txt`;
+              a.download = `nysc_new_backup_codes_${userData?.stateCode}.txt`;
               document.body.appendChild(a);
               a.click();
               document.body.removeChild(a);
@@ -677,7 +681,7 @@ export default function SecuritySettings({ darkMode }) {
           <div className={`rounded-xl p-6 ${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
             <h4 className={`text-lg font-semibold mb-4 ${darkMode ? 'text-white' : 'text-gray-800'}`}>Change Password</h4>
             <p className={`mb-4 ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-              A password reset code will be sent to: <strong>{user?.email}</strong>
+              A password reset code will be sent to: <strong>{userData?.email}</strong>
             </p>
             
             <button
@@ -700,7 +704,7 @@ export default function SecuritySettings({ darkMode }) {
           <div className={`rounded-xl p-6 ${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
             <h4 className={`text-lg font-semibold mb-4 ${darkMode ? 'text-white' : 'text-gray-800'}`}>Reset Password</h4>
             <p className={`mb-4 ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-              Enter the 6-digit code sent to <strong>{user?.email}</strong> and set a new password:
+              Enter the 6-digit code sent to <strong>{userData?.email}</strong> and set a new password:
             </p>
             
             <div className="space-y-4">

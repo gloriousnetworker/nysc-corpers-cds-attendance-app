@@ -25,22 +25,16 @@ export function AuthProvider({ children }) {
     return null;
   };
 
-  const setAuthCookie = (token) => {
-    if (typeof window === 'undefined') return;
-    
-    const domain = window.location.hostname.includes('localhost') 
-      ? 'localhost' 
-      : window.location.hostname.includes('vercel.app')
-      ? '.vercel.app'
-      : window.location.hostname;
-    
-    const expires = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toUTCString();
-    
-    document.cookie = `nysc_token=${token}; Path=/; Domain=${domain}; SameSite=Lax; Expires=${expires}${process.env.NODE_ENV === 'production' ? '; Secure' : ''}`;
-  };
-
   const checkAuth = async () => {
     try {
+      const authCookie = getAuthCookie();
+      
+      if (!authCookie) {
+        setLoading(false);
+        setAuthChecked(true);
+        return;
+      }
+
       const response = await fetch(API_ENDPOINTS.ME, {
         method: 'GET',
         credentials: 'include',
@@ -55,11 +49,11 @@ export function AuthProvider({ children }) {
       if (response.ok && data.success && data.data && data.data.corper) {
         setUser(data.data.corper);
       } else {
-        setUser(null);
+        clearAuth();
       }
     } catch (error) {
       console.error('Auth check error:', error);
-      setUser(null);
+      clearAuth();
     } finally {
       setLoading(false);
       setAuthChecked(true);
@@ -83,6 +77,9 @@ export function AuthProvider({ children }) {
       if (response.ok && data.success) {
         const userData = data.data.corper || data.data;
         setUser(userData);
+        
+        await checkAuth();
+        
         return { success: true, data: userData };
       } else {
         return { success: false, message: data.message || 'Login failed' };
@@ -114,6 +111,9 @@ export function AuthProvider({ children }) {
       if (response.ok && data.success) {
         const userData = data.data.corper;
         setUser(userData);
+        
+        await checkAuth();
+        
         return { success: true, data: userData };
       } else {
         return { success: false, message: data.message };
@@ -138,6 +138,7 @@ export function AuthProvider({ children }) {
       console.error('Logout error:', error);
     } finally {
       clearAuth();
+      router.push('/login');
     }
   };
 
@@ -155,9 +156,26 @@ export function AuthProvider({ children }) {
     }
   };
 
-  const updateUser = (updatedData) => {
-    const mergedData = { ...user, ...updatedData };
-    setUser(mergedData);
+  const updateUser = async (updatedData) => {
+    try {
+      const response = await fetch(API_ENDPOINTS.ME, {
+        method: 'GET',
+        credentials: 'include',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        }
+      });
+
+      const data = await response.json();
+      
+      if (response.ok && data.success && data.data && data.data.corper) {
+        const mergedData = { ...data.data.corper, ...updatedData };
+        setUser(mergedData);
+      }
+    } catch (error) {
+      console.error('Error updating user:', error);
+    }
   };
 
   const fetchWithAuth = async (url, options = {}) => {
@@ -182,14 +200,13 @@ export function AuthProvider({ children }) {
 
       if (response.status === 401) {
         clearAuth();
+        router.push('/login');
         throw new Error('Session expired');
       }
 
       return response;
     } catch (error) {
-      if (error.message === 'Session expired') {
-        router.push('/login');
-      } else {
+      if (error.message !== 'Session expired') {
         console.error('API request error:', error);
       }
       throw error;
@@ -211,31 +228,6 @@ export function AuthProvider({ children }) {
     }
   };
 
-  const demoLogin = async (stateRoute) => {
-    try {
-      const response = await fetch(API_ENDPOINTS.DEMO_LOGIN, {
-        method: 'POST',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        }
-      });
-
-      const data = await response.json();
-      
-      if (response.ok && data.success) {
-        setUser(data.data.corper);
-        return { success: true };
-      } else {
-        return { success: false, message: data.message || 'Demo login failed' };
-      }
-    } catch (error) {
-      console.error('Demo login error:', error);
-      return { success: false, message: 'Network error' };
-    }
-  };
-
   return (
     <AuthContext.Provider value={{
       user,
@@ -246,7 +238,6 @@ export function AuthProvider({ children }) {
       fetchWithAuth,
       getCurrentUser,
       clearAuth,
-      demoLogin,
       isAuthenticated: !!user,
       loading,
       authChecked,

@@ -20,14 +20,14 @@ function Auth2FAContent() {
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const token = urlParams.get('tkn');
-    const storedStateCode = localStorage.getItem('stateCode');
+    const state = urlParams.get('stateCode');
     
-    if (!token || !storedStateCode) {
+    if (!token || !state) {
       router.push('/login');
       return;
     }
     
-    setStateCode(storedStateCode);
+    setStateCode(state);
     setTempToken(token);
   }, [router]);
 

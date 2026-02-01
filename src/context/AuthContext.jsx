@@ -41,23 +41,6 @@ export function AuthProvider({ children }) {
 
   const checkAuth = async () => {
     try {
-      const authCookie = getAuthCookie();
-      const storedUser = localStorage.getItem('nysc_user');
-      
-      if (!authCookie) {
-        if (storedUser) {
-          try {
-            const parsedUser = JSON.parse(storedUser);
-            setUser(parsedUser);
-          } catch {
-            clearAuth();
-          }
-        }
-        setLoading(false);
-        setAuthChecked(true);
-        return;
-      }
-
       const response = await fetch(API_ENDPOINTS.ME, {
         method: 'GET',
         credentials: 'include',
@@ -71,32 +54,12 @@ export function AuthProvider({ children }) {
       
       if (response.ok && data.success && data.data && data.data.corper) {
         setUser(data.data.corper);
-        localStorage.setItem('nysc_user', JSON.stringify(data.data.corper));
       } else {
-        if (storedUser) {
-          try {
-            const parsedUser = JSON.parse(storedUser);
-            setUser(parsedUser);
-          } catch {
-            clearAuth();
-          }
-        } else {
-          clearAuth();
-        }
+        setUser(null);
       }
     } catch (error) {
       console.error('Auth check error:', error);
-      const storedUser = localStorage.getItem('nysc_user');
-      if (storedUser) {
-        try {
-          const parsedUser = JSON.parse(storedUser);
-          setUser(parsedUser);
-        } catch {
-          clearAuth();
-        }
-      } else {
-        clearAuth();
-      }
+      setUser(null);
     } finally {
       setLoading(false);
       setAuthChecked(true);
@@ -120,10 +83,6 @@ export function AuthProvider({ children }) {
       if (response.ok && data.success) {
         const userData = data.data.corper || data.data;
         setUser(userData);
-        localStorage.setItem('nysc_user', JSON.stringify(userData));
-        
-        await checkAuth();
-        
         return { success: true, data: userData };
       } else {
         return { success: false, message: data.message || 'Login failed' };
@@ -155,10 +114,6 @@ export function AuthProvider({ children }) {
       if (response.ok && data.success) {
         const userData = data.data.corper;
         setUser(userData);
-        localStorage.setItem('nysc_user', JSON.stringify(userData));
-        
-        await checkAuth();
-        
         return { success: true, data: userData };
       } else {
         return { success: false, message: data.message };
@@ -183,17 +138,11 @@ export function AuthProvider({ children }) {
       console.error('Logout error:', error);
     } finally {
       clearAuth();
-      router.push('/login');
     }
   };
 
   const clearAuth = () => {
     setUser(null);
-    localStorage.removeItem('nysc_user');
-    localStorage.removeItem('pending_verification_email');
-    localStorage.removeItem('pending_verification_stateCode');
-    localStorage.removeItem('tempToken');
-    localStorage.removeItem('stateCode');
     
     if (typeof window !== 'undefined') {
       const domain = window.location.hostname.includes('localhost') 
@@ -209,7 +158,6 @@ export function AuthProvider({ children }) {
   const updateUser = (updatedData) => {
     const mergedData = { ...user, ...updatedData };
     setUser(mergedData);
-    localStorage.setItem('nysc_user', JSON.stringify(mergedData));
   };
 
   const fetchWithAuth = async (url, options = {}) => {
@@ -234,13 +182,14 @@ export function AuthProvider({ children }) {
 
       if (response.status === 401) {
         clearAuth();
-        router.push('/login');
         throw new Error('Session expired');
       }
 
       return response;
     } catch (error) {
-      if (error.message !== 'Session expired') {
+      if (error.message === 'Session expired') {
+        router.push('/login');
+      } else {
         console.error('API request error:', error);
       }
       throw error;
@@ -254,12 +203,36 @@ export function AuthProvider({ children }) {
       
       if (data.success && data.data.corper) {
         setUser(data.data.corper);
-        localStorage.setItem('nysc_user', JSON.stringify(data.data.corper));
         return data.data.corper;
       }
       return null;
     } catch (error) {
       return null;
+    }
+  };
+
+  const demoLogin = async (stateRoute) => {
+    try {
+      const response = await fetch(API_ENDPOINTS.DEMO_LOGIN, {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        }
+      });
+
+      const data = await response.json();
+      
+      if (response.ok && data.success) {
+        setUser(data.data.corper);
+        return { success: true };
+      } else {
+        return { success: false, message: data.message || 'Demo login failed' };
+      }
+    } catch (error) {
+      console.error('Demo login error:', error);
+      return { success: false, message: 'Network error' };
     }
   };
 
@@ -273,6 +246,7 @@ export function AuthProvider({ children }) {
       fetchWithAuth,
       getCurrentUser,
       clearAuth,
+      demoLogin,
       isAuthenticated: !!user,
       loading,
       authChecked,

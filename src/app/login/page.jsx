@@ -16,7 +16,7 @@ export default function LoginPage() {
   const [showStateSelection, setShowStateSelection] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
   const router = useRouter();
-  const { login } = useAuth();
+  const { login, demoLogin } = useAuth();
 
   useEffect(() => {
     const savedTheme = localStorage.getItem('nysc_dark_mode');
@@ -54,8 +54,6 @@ export default function LoginPage() {
       }
       
       if (data.success && data.data?.status === 'pending') {
-        localStorage.setItem('pending_verification_email', data.data.email);
-        localStorage.setItem('pending_verification_stateCode', data.data.stateCode);
         router.push('/login/continue-registration');
         return 'pending';
       }
@@ -99,9 +97,7 @@ export default function LoginPage() {
         if (userData.requires2FA || userData.twoFactorEnabled) {
           const tempToken = userData.tempToken;
           const stateCode = userData.stateCode;
-          localStorage.setItem('tempToken', tempToken);
-          localStorage.setItem('stateCode', stateCode);
-          router.push(`/login/auth-2fa?tkn=${encodeURIComponent(tempToken)}`);
+          router.push(`/login/auth-2fa?tkn=${encodeURIComponent(tempToken)}&stateCode=${encodeURIComponent(stateCode)}`);
         } else {
           const servingState = userData.servingState?.toLowerCase();
           const stateRoutes = {
@@ -137,33 +133,22 @@ export default function LoginPage() {
     setShowStateSelection(true);
   };
 
-  const handleStateSelect = (stateRoute) => {
-    const mockUserData = {
-      firstName: 'Demo',
-      lastName: 'User',
-      fullName: 'Demo User',
-      email: 'demo@example.com',
-      phone: '08012345678',
-      stateCode: 'NYSC/2024A/123456',
-      servingState: 'Lagos',
-      localGovernment: 'Ikeja',
-      ppa: 'Ministry of Education',
-      cdsGroup: 'Education',
-      cdsZone: 'Zone 3'
-    };
-    
-    localStorage.setItem('nysc_user', JSON.stringify(mockUserData));
-    
-    if (typeof window !== 'undefined') {
-      const domain = window.location.hostname.includes('localhost') 
-        ? 'localhost' 
-        : '.vercel.app';
-      const expires = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toUTCString();
-      
-      document.cookie = `nysc_token=demo-token-12345; Path=/; Domain=${domain}; SameSite=Lax; Expires=${expires}${process.env.NODE_ENV === 'production' ? '; Secure' : ''}`;
+  const handleStateSelect = async (stateRoute) => {
+    setLoading(true);
+    try {
+      const result = await demoLogin(stateRoute);
+      if (result.success) {
+        toast.success('Demo login successful!');
+      } else {
+        toast.error(result.message || 'Demo login failed');
+        setShowStateSelection(false);
+      }
+    } catch (err) {
+      toast.error('Demo login failed. Please try again.');
+      setShowStateSelection(false);
+    } finally {
+      setLoading(false);
     }
-    
-    router.push(stateRoute);
   };
 
   const handleBackToMain = () => {

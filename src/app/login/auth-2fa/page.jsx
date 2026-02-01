@@ -46,7 +46,7 @@ export default function Auth2FAPage() {
     newCodes[index] = value;
     setCodes(newCodes);
     
-    if (value && index < 5) {
+    if (value && index < 5 && inputRefs.current[index + 1]) {
       inputRefs.current[index + 1].focus();
     }
     
@@ -59,7 +59,7 @@ export default function Auth2FAPage() {
   };
 
   const handleKeyDown = (index, e) => {
-    if (e.key === 'Backspace' && !codes[index] && index > 0) {
+    if (e.key === 'Backspace' && !codes[index] && index > 0 && inputRefs.current[index - 1]) {
       inputRefs.current[index - 1].focus();
     }
     
@@ -175,7 +175,7 @@ export default function Auth2FAPage() {
             {codes.map((code, index) => (
               <input
                 key={index}
-                ref={(el) => inputRefs.current[index] = el}
+                ref={(el) => (inputRefs.current[index] = el)}
                 type="text"
                 inputMode="numeric"
                 pattern="[0-9]*"

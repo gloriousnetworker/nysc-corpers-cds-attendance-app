@@ -1,34 +1,35 @@
 'use client';
-import { useState, useEffect, useRef } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useState, useEffect, useRef, Suspense } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
 import { useAuth } from '@/context/AuthContext';
 
-export default function Auth2FAPage() {
+function Auth2FAContent() {
   const [codes, setCodes] = useState(['', '', '', '', '', '']);
   const [loading, setLoading] = useState(false);
   const [resendLoading, setResendLoading] = useState(false);
   const [countdown, setCountdown] = useState(30);
   const [canResend, setCanResend] = useState(false);
   const [stateCode, setStateCode] = useState('');
+  const [tempToken, setTempToken] = useState('');
   const router = useRouter();
-  const searchParams = useSearchParams();
   const inputRefs = useRef([]);
   const { loginWith2FA } = useAuth();
 
   useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const token = urlParams.get('tkn');
     const storedStateCode = localStorage.getItem('stateCode');
-    const tempToken = searchParams.get('tkn');
     
-    if (!tempToken || !storedStateCode) {
+    if (!token || !storedStateCode) {
       router.push('/login');
       return;
     }
     
     setStateCode(storedStateCode);
-    localStorage.setItem('tempToken', tempToken);
-  }, [router, searchParams]);
+    setTempToken(token);
+  }, [router]);
 
   useEffect(() => {
     if (countdown > 0) {
@@ -75,22 +76,17 @@ export default function Auth2FAPage() {
   const handleSubmitVerification = async (twoFactorCode) => {
     setLoading(true);
     
-    const tempToken = searchParams.get('tkn') || localStorage.getItem('tempToken');
-    const storedStateCode = localStorage.getItem('stateCode');
-    
-    if (!tempToken || !storedStateCode) {
+    if (!tempToken || !stateCode) {
       toast.error('Session expired. Please login again.');
       router.push('/login');
       return;
     }
 
     try {
-      const result = await loginWith2FA(storedStateCode, twoFactorCode, tempToken);
+      const result = await loginWith2FA(stateCode, twoFactorCode, tempToken);
 
       if (result.success) {
         const userData = result.data;
-        localStorage.removeItem('tempToken');
-        localStorage.removeItem('stateCode');
         
         const servingState = userData.servingState?.toLowerCase();
         const stateRoutes = {
@@ -128,8 +124,6 @@ export default function Auth2FAPage() {
   };
 
   const handleBackToLogin = () => {
-    localStorage.removeItem('tempToken');
-    localStorage.removeItem('stateCode');
     router.push('/login');
   };
 
@@ -246,5 +240,20 @@ export default function Auth2FAPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function Auth2FAPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen w-full flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <div className="h-12 w-12 border-4 border-t-4 border-gray-300 border-t-[#008753] rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading 2FA verification...</p>
+        </div>
+      </div>
+    }>
+      <Auth2FAContent />
+    </Suspense>
   );
 }
